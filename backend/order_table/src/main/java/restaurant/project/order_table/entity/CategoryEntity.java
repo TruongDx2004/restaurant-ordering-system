@@ -1,15 +1,9 @@
 package restaurant.project.order_table.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "categories")
@@ -29,4 +23,10 @@ public class CategoryEntity {
      */
     @Column(name = "name", nullable = false, length = 255, unique = true)
     private String name;
+
+    /**
+     * One Category -> Many Dishes
+     */
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DishEntity> dishes;
 }
