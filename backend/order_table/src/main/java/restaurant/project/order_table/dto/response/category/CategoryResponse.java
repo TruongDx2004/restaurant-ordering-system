@@ -1,0 +1,16 @@
+package restaurant.project.order_table.dto.response.category;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CategoryResponse {
+
+    private Long id;
+    private String name;
+}
