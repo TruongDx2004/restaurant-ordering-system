@@ -22,6 +22,7 @@ import restaurant.project.order_table.dto.request.invoiceitem.InvoiceItemUpdateR
 import restaurant.project.order_table.dto.response.ApiResponse;
 import restaurant.project.order_table.dto.response.invoiceitem.InvoiceItemResponse;
 import restaurant.project.order_table.entity.InvoiceItemEntity;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 import restaurant.project.order_table.mapper.InvoiceItemMapper;
 import restaurant.project.order_table.service.InvoiceItemService;
 
@@ -58,7 +59,8 @@ public class InvoiceItemController {
      */
     @GetMapping
     public ApiResponse<List<InvoiceItemResponse>> getAllInvoiceItems() {
-        List<InvoiceItemResponse> invoiceItems = invoiceItemMapper.toResponseList(invoiceItemService.getAllInvoiceItems());
+        List<InvoiceItemResponse> invoiceItems = invoiceItemMapper
+                .toResponseList(invoiceItemService.getAllInvoiceItems());
         return ApiResponse.success(invoiceItems, "Invoice items retrieved successfully");
     }
 
@@ -88,7 +90,8 @@ public class InvoiceItemController {
      */
     @GetMapping("/invoice/{invoiceId}")
     public ApiResponse<List<InvoiceItemResponse>> getInvoiceItemsByInvoice(@PathVariable Long invoiceId) {
-        List<InvoiceItemResponse> invoiceItems = invoiceItemMapper.toResponseList(invoiceItemService.getInvoiceItemsByInvoice(invoiceId));
+        List<InvoiceItemResponse> invoiceItems = invoiceItemMapper
+                .toResponseList(invoiceItemService.getInvoiceItemsByInvoice(invoiceId));
         return ApiResponse.success(invoiceItems, "Invoice items retrieved successfully");
     }
 
@@ -97,7 +100,8 @@ public class InvoiceItemController {
      */
     @GetMapping("/dish/{dishId}")
     public ApiResponse<List<InvoiceItemResponse>> getInvoiceItemsByDish(@PathVariable Long dishId) {
-        List<InvoiceItemResponse> invoiceItems = invoiceItemMapper.toResponseList(invoiceItemService.getInvoiceItemsByDish(dishId));
+        List<InvoiceItemResponse> invoiceItems = invoiceItemMapper
+                .toResponseList(invoiceItemService.getInvoiceItemsByDish(dishId));
         return ApiResponse.success(invoiceItems, "Invoice items retrieved successfully");
     }
 
@@ -123,5 +127,18 @@ public class InvoiceItemController {
             @RequestParam Integer quantity) {
         InvoiceItemEntity created = invoiceItemService.addItemToInvoice(invoiceId, dishId, quantity);
         return ApiResponse.success(invoiceItemMapper.toResponse(created), "Item added to invoice successfully");
+    }
+
+    /**
+     * Update status of invoice item
+     * Example:
+     * PUT /api/invoice-items/2/status?status=PREPARING
+     */
+    @PutMapping("/{id}/status")
+    public ApiResponse<InvoiceItemResponse> updateStatus(
+            @PathVariable Long id,
+            @RequestParam InvoiceItemStatus status) {
+        InvoiceItemEntity updated = invoiceItemService.updateStatus(id, status);
+        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Invoice item status updated successfully");
     }
 }

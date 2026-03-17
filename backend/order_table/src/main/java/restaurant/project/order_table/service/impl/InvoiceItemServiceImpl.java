@@ -1,6 +1,7 @@
 package restaurant.project.order_table.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import restaurant.project.order_table.entity.DishEntity;
 import restaurant.project.order_table.entity.InvoiceEntity;
 import restaurant.project.order_table.entity.InvoiceItemEntity;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 import restaurant.project.order_table.exception.BadRequestException;
 import restaurant.project.order_table.repository.InvoiceItemRepository;
 import restaurant.project.order_table.service.DishService;
@@ -25,6 +27,8 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 
     @Override
     public InvoiceItemEntity createInvoiceItem(InvoiceItemEntity invoiceItem) {
+        if (invoiceItem.getStatus() == null)
+            invoiceItem.setStatus(InvoiceItemStatus.WAITING);
         return invoiceItemRepository.save(invoiceItem);
     }
 
@@ -46,7 +50,9 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
         existingItem.setDish(invoiceItem.getDish());
         existingItem.setQuantity(invoiceItem.getQuantity());
         existingItem.setUnitPrice(invoiceItem.getUnitPrice());
-        
+        if (invoiceItem.getStatus() != null) {
+            existingItem.setStatus(invoiceItem.getStatus());
+        }
         // Recalculate total price
         BigDecimal totalPrice = invoiceItem.getUnitPrice()
                 .multiply(BigDecimal.valueOf(invoiceItem.getQuantity()));
@@ -103,5 +109,24 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
         invoiceItem.setTotalPrice(totalPrice);
 
         return invoiceItemRepository.save(invoiceItem);
+    }
+
+    @Override
+    public InvoiceItemEntity updateStatus(Long id, InvoiceItemStatus status) {
+        InvoiceItemEntity item = getInvoiceItemById(id);
+
+        // ❗ Validate flow (rất quan trọng)
+        if (item.getStatus() == InvoiceItemStatus.SERVED) {
+            throw new BadRequestException("Cannot update status of a served item");
+        }
+
+        if (item.getStatus() == InvoiceItemStatus.CANCELLED) {
+            throw new BadRequestException("Cannot update status of a cancelled item");
+        }
+
+        item.setStatus(status);
+        item.setUpdatedAt(LocalDateTime.now());
+
+        return invoiceItemRepository.save(item);
     }
 }

@@ -3,6 +3,7 @@ package restaurant.project.order_table.service;
 import java.util.List;
 
 import restaurant.project.order_table.entity.InvoiceItemEntity;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 
 public interface InvoiceItemService {
 
@@ -79,4 +80,13 @@ public interface InvoiceItemService {
      * @return created invoice item
      */
     InvoiceItemEntity addItemToInvoice(Long invoiceId, Long dishId, Integer quantity);
+
+    /**
+     * Update invoice item status
+     *
+     * @param id invoice item ID
+     * @param status new status
+     * @return updated invoice item
+     */
+    InvoiceItemEntity updateStatus(Long id, InvoiceItemStatus status);
 }
