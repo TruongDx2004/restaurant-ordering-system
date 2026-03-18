@@ -19,4 +19,8 @@ public class InvoiceItemResponse {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private String status;
+    private String note;
+    private String createdAt;
+    private String updatedAt;
 }

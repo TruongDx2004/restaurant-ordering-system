@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 
 @Data
 @NoArgsConstructor
@@ -30,4 +31,7 @@ public class InvoiceItemCreateRequest {
 
     @NotNull(message = "Total price is required")
     private BigDecimal totalPrice;
+
+    private InvoiceItemStatus status; // WAITING, PREPARING, SERVED, CANCELLED
+    private String note; // Ghi chú từ khách
 }

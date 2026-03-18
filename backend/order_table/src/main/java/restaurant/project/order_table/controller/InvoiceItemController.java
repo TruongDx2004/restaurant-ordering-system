@@ -134,7 +134,7 @@ public class InvoiceItemController {
      * Example:
      * PUT /api/invoice-items/2/status?status=PREPARING
      */
-    @PutMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     public ApiResponse<InvoiceItemResponse> updateStatus(
             @PathVariable Long id,
             @RequestParam InvoiceItemStatus status) {
