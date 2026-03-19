@@ -226,20 +226,6 @@ const OrderManagement = () => {
                       >
                         <i className="fas fa-eye"></i>
                       </button>
-                      {order.status !== 'COMPLETED' && order.status !== 'CANCELLED' && (
-                        <select
-                          className={styles.statusSelect}
-                          value={order.status}
-                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        >
-                          <option value="PENDING">Chờ xác nhận</option>
-                          <option value="CONFIRMED">Đã xác nhận</option>
-                          <option value="PREPARING">Đang chuẩn bị</option>
-                          <option value="READY">Sẵn sàng</option>
-                          <option value="COMPLETED">Hoàn thành</option>
-                          <option value="CANCELLED">Hủy</option>
-                        </select>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -291,7 +277,7 @@ const OrderManagement = () => {
                       {new Intl.NumberFormat('vi-VN', {
                         style: 'currency',
                         currency: 'VND'
-                      }).format(item.price * item.quantity)}
+                      }).format(item.unitPrice * item.quantity)}
                     </span>
                   </div>
                 ))}

@@ -171,6 +171,9 @@ export const invoiceApi = {
       throw error;
     }
   },
+
+  // Aliases for compatibility
+  updateInvoiceStatus: async (id, status) => invoiceApi.updateStatus(id, status),
 };
 
 export default invoiceApi;

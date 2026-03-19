@@ -101,13 +101,15 @@
 
 .formGroup input,
 .formGroup textarea {
-  width: 100%;
+  width: 92%;
   padding: 10px 12px;
   border: 1px solid #e9ecef;
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
   font-family: inherit;
+  background-color: white;
+  color: #000;
 }
 
 .formGroup input:focus,
