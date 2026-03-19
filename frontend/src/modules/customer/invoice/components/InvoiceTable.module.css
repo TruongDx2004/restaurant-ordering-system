@@ -36,6 +36,52 @@
   text-align: right;
 }
 
+.nameWithStatus {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.itemName {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.statusLine {
+  height: 4px;
+  border-radius: 2px;
+  width: 60px;
+  position: relative;
+}
+
+.statusLabel {
+  font-size: 10px;
+  position: absolute;
+  top: 6px;
+  left: 0;
+  white-space: nowrap;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusLine.waiting { background-color: #f39c12; color: #f39c12; }
+.statusLine.preparing { background-color: #e74c3c; color: #e74c3c; }
+.statusLine.served { background-color: #27ae60; color: #27ae60; }
+.statusLine.cancelled { background-color: #95a5a6; color: #95a5a6; }
+
+tr.cancelled {
+  opacity: 0.6;
+}
+
+tr.cancelled .itemName {
+  text-decoration: line-through;
+}
+
+.invoiceTable tbody tr {
+  height: 70px;
+}
+
 .invoiceTable tbody tr {
   border-bottom: 1px solid #ecf0f1;
   transition: background-color 0.2s ease;

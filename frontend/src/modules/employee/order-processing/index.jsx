@@ -216,9 +216,9 @@ const OrderProcessing = () => {
                       <div className={styles.itemName}>
                         <strong>{item.quantity}x</strong> {item.dish?.name || 'Món ăn'}
                       </div>
-                      {item.notes && (
+                      {item.note && (
                         <div className={styles.itemNote}>
-                          <i className="fas fa-comment-dots"></i> {item.notes}
+                          <i className="fas fa-comment-dots"></i> {item.note}
                         </div>
                       )}
                     </div>

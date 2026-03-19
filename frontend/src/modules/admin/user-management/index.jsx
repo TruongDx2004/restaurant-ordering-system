@@ -196,7 +196,7 @@ const UserManagement = () => {
               filteredUsers.map(user => (
                 <tr key={user.id}>
                   <td>
-                    <div className={styles.userName}>{user.fullName}</div>
+                    <div className={styles.userName}>{user.name}</div>
                   </td>
                   <td>{user.email}</td>
                   <td>{user.phone}</td>

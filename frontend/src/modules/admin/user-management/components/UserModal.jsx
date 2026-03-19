@@ -72,7 +72,7 @@ export const UserModal = ({ user, onSave, onClose }) => {
       }
       await onSave(dataToSend);
     } catch (err) {
-      setError(err.response?.data?.message || 'Có lỗi xảy ra');
+      setError(err.message || 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }
