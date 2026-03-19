@@ -24,4 +24,7 @@ public class InvoiceItemUpdateRequest {
 
     @NotNull(message = "Unit price is required")
     private BigDecimal unitPrice;
+    
+    private String status; // WAITING, PREPARING, SERVED, CANCELLED
+    private String note; // Ghi chú từ khách
 }

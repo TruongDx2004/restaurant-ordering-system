@@ -13,6 +13,7 @@ import restaurant.project.order_table.entity.DishEntity;
 import restaurant.project.order_table.entity.InvoiceEntity;
 import restaurant.project.order_table.entity.InvoiceItemEntity;
 import restaurant.project.order_table.entity.TableEntity;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 import restaurant.project.order_table.entity.enums.InvoiceStatus;
 import restaurant.project.order_table.entity.enums.TableStatus;
 import restaurant.project.order_table.exception.BadRequestException;
@@ -176,9 +177,9 @@ public class InvoiceServiceImpl implements InvoiceService {
             DishEntity dish = dishRepository.findById(itemData.dishId)
                     .orElseThrow(() -> new BadRequestException("Dish not found with id: " + itemData.dishId));
 
-            // Check if this dish already exists in the invoice
+            // Kiểm tra xem món đã có trong hóa đơn chưa (dựa trên dishId), cùng trạng thái (WATTING)
             InvoiceItemEntity existingItem = existingItems.stream()
-                    .filter(item -> item.getDish().getId().equals(itemData.dishId))
+                    .filter(item -> item.getDish().getId().equals(itemData.dishId) && item.getStatus() == itemData.status)
                     .findFirst()
                     .orElse(null);
 
@@ -202,6 +203,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 // Món mới -> Tạo invoice item mới
                 InvoiceItemEntity invoiceItem = new InvoiceItemEntity();
                 invoiceItem.setInvoice(invoice);
+                invoiceItem.setStatus(itemData.status != null ? itemData.status : InvoiceItemStatus.WAITING);
+                invoiceItem.setNote(itemData.notes);
                 invoiceItem.setDish(dish);
                 invoiceItem.setQuantity(itemData.quantity);
                 

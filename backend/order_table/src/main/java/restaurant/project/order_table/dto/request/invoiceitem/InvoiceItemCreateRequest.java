@@ -2,12 +2,16 @@ package restaurant.project.order_table.dto.request.invoiceitem;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 
 @Data
 @NoArgsConstructor
@@ -30,4 +34,11 @@ public class InvoiceItemCreateRequest {
 
     @NotNull(message = "Total price is required")
     private BigDecimal totalPrice;
+
+    @Builder.Default
+    @NotNull(message = "Status is required")
+    @Enumerated(EnumType.STRING)
+    private InvoiceItemStatus status = InvoiceItemStatus.WAITING; // WAITING, PREPARING, SERVED, CANCELLED
+    
+    private String note; // Ghi chú từ khách
 }

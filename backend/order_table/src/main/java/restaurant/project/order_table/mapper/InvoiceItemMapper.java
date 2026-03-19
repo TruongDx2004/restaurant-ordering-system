@@ -12,6 +12,7 @@ import restaurant.project.order_table.dto.response.invoiceitem.InvoiceItemRespon
 import restaurant.project.order_table.entity.DishEntity;
 import restaurant.project.order_table.entity.InvoiceEntity;
 import restaurant.project.order_table.entity.InvoiceItemEntity;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 import restaurant.project.order_table.service.DishService;
 import restaurant.project.order_table.service.InvoiceService;
 
@@ -26,23 +27,31 @@ public class InvoiceItemMapper {
     public InvoiceItemEntity toEntity(InvoiceItemCreateRequest request) {
         InvoiceEntity invoice = invoiceService.getInvoiceById(request.getInvoiceId());
         DishEntity dish = dishService.getDishById(request.getDishId());
-        
+        System.out.println("Status in request: " + request.getStatus() + ", defaulting to WAITING if null");
         return InvoiceItemEntity.builder()
                 .invoice(invoice)
                 .dish(dish)
                 .quantity(request.getQuantity())
                 .unitPrice(request.getUnitPrice())
                 .totalPrice(request.getTotalPrice())
+                .status(request.getStatus() != null
+                        ? request.getStatus()
+                        : InvoiceItemStatus.WAITING)
+                .note(request.getNote())
                 .build();
     }
 
     public InvoiceItemEntity toEntity(InvoiceItemUpdateRequest request) {
         DishEntity dish = dishService.getDishById(request.getDishId());
-        
+
         return InvoiceItemEntity.builder()
                 .dish(dish)
                 .quantity(request.getQuantity())
                 .unitPrice(request.getUnitPrice())
+                .status(request.getStatus() != null
+                        ? InvoiceItemStatus.valueOf(request.getStatus())
+                        : InvoiceItemStatus.WAITING)
+                .note(request.getNote())
                 .build();
     }
 
@@ -53,6 +62,8 @@ public class InvoiceItemMapper {
                 .quantity(entity.getQuantity())
                 .unitPrice(entity.getUnitPrice())
                 .totalPrice(entity.getTotalPrice())
+                .status(entity.getStatus().name())
+                .note(entity.getNote())
                 .build();
     }
 

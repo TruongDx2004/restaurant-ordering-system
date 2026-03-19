@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import restaurant.project.order_table.entity.InvoiceEntity;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 import restaurant.project.order_table.entity.enums.InvoiceStatus;
 
 public interface InvoiceService {
@@ -121,11 +122,13 @@ public interface InvoiceService {
     class ItemData {
         public Long dishId;
         public Integer quantity;
+        public InvoiceItemStatus status;
         public String notes;
 
-        public ItemData(Long dishId, Integer quantity, String notes) {
+        public ItemData(Long dishId, Integer quantity, InvoiceItemStatus status, String notes) {
             this.dishId = dishId;
             this.quantity = quantity;
+            this.status = status;
             this.notes = notes;
         }
     }
