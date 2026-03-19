@@ -22,6 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import restaurant.project.order_table.dto.request.invoice.InvoiceCreateRequest;
 import restaurant.project.order_table.dto.request.invoice.InvoiceUpdateRequest;
+import restaurant.project.order_table.dto.request.invoice.InvoiceWithItemsRequest;
 import restaurant.project.order_table.dto.response.ApiResponse;
 import restaurant.project.order_table.dto.response.invoice.InvoiceResponse;
 import restaurant.project.order_table.entity.InvoiceEntity;
@@ -159,12 +160,11 @@ public class InvoiceController {
      */
     @PostMapping("/create-with-items")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<InvoiceResponse> createInvoiceWithItems(@Valid @RequestBody restaurant.project.order_table.dto.request.invoice.InvoiceWithItemsRequest request) {
+    public ApiResponse<InvoiceResponse> createInvoiceWithItems(@Valid @RequestBody InvoiceWithItemsRequest request) {
         // Convert request items to ItemData
         List<InvoiceService.ItemData> items = request.getItems().stream()
-                .map(item -> new InvoiceService.ItemData(item.getDishId(), item.getQuantity(), item.getNotes()))
+                .map(item -> new InvoiceService.ItemData(item.getDishId(), item.getQuantity(), item.getStatus(),item.getNotes()))
                 .toList();
-
         InvoiceEntity created = invoiceService.createInvoiceWithItems(request.getTableId(), items);
         return ApiResponse.success(invoiceMapper.toResponse(created), "Invoice with items created successfully");
     }

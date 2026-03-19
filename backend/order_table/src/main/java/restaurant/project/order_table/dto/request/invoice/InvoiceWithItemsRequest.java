@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 
 /**
  * Request DTO for creating invoice with items
@@ -38,6 +39,10 @@ public class InvoiceWithItemsRequest {
         
         @NotNull(message = "Quantity is required")
         private Integer quantity;
+
+        @Builder.Default
+        @NotNull(message = "Status is required")
+        private InvoiceItemStatus status = InvoiceItemStatus.WAITING; // WAITING, PREPARING, SERVED, CANCELLED
         
         private String notes;
     }
