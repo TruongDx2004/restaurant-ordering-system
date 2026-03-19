@@ -177,8 +177,7 @@ export const DishModal = ({ dish, categories, onSave, onClose }) => {
                 onChange={handleChange}
               >
                 <option value="AVAILABLE">Có sẵn</option>
-                <option value="OUT_OF_STOCK">Hết hàng</option>
-                <option value="DISCONTINUED">Ngừng bán</option>
+                <option value="SOLD_OUT">Hết hàng</option>
               </select>
             </div>
           </div>

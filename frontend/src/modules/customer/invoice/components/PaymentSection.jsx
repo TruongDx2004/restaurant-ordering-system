@@ -37,10 +37,14 @@ export const PaymentSection = ({
   const { subtotal, serviceFee, total } = calculateTotals();
 
   /**
-   * Check if all items are ready (giả định - sau này dùng status field)
-   * Tạm thời cho phép thanh toán nếu có items
+   * Check if all items are ready
+   * Only allows payment if items are 'SERVED' or 'CANCELLED'
    */
-  const canPay = items && items.length > 0 && !isProcessing;
+  const hasPendingItems = items && items.some(item => 
+    item.status === 'WAITING' || item.status === 'PREPARING'
+  );
+  
+  const canPay = items && items.length > 0 && !isProcessing && !hasPendingItems;
 
   /**
    * Handle payment

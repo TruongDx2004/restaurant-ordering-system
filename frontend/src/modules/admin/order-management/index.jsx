@@ -62,11 +62,11 @@ const OrderManagement = () => {
   // Get status color
   const getStatusColor = (status) => {
     switch (status) {
-      case 'PENDING': return 'orange';
+      case 'OPEN': return 'orange';
       case 'CONFIRMED': return 'blue';
       case 'PREPARING': return 'purple';
       case 'READY': return 'teal';
-      case 'COMPLETED': return 'green';
+      case 'PAID': return 'green';
       case 'CANCELLED': return 'red';
       default: return 'gray';
     }

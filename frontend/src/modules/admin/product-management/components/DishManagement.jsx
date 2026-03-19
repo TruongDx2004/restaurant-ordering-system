@@ -160,8 +160,7 @@ export const DishManagement = () => {
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="all">Tất cả trạng thái</option>
             <option value="AVAILABLE">Có sẵn</option>
-            <option value="OUT_OF_STOCK">Hết hàng</option>
-            <option value="DISCONTINUED">Ngừng bán</option>
+            <option value="SOLD_OUT">Hết hàng</option>
           </select>
         </div>
 
@@ -186,7 +185,7 @@ export const DishManagement = () => {
         <div className={styles.stat}>
           <span className={styles.statLabel}>Hết hàng:</span>
           <span className={styles.statValue}>
-            {dishes.filter(d => d.status === 'OUT_OF_STOCK').length}
+            {dishes.filter(d => d.status === 'SOLD_OUT').length}
           </span>
         </div>
       </div>
@@ -240,8 +239,7 @@ export const DishManagement = () => {
                       onChange={(e) => handleStatusChange(dish.id, e.target.value)}
                     >
                       <option value="AVAILABLE">Có sẵn</option>
-                      <option value="OUT_OF_STOCK">Hết hàng</option>
-                      <option value="DISCONTINUED">Ngừng bán</option>
+                      <option value="SOLD_OUT">Hết hàng</option>
                     </select>
                   </td>
                   <td>
