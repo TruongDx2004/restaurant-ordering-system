@@ -374,6 +374,64 @@
   background: #f9f9f9;
 }
 
+/* ========== FLOATING MESSAGE BUTTON ========== */
+.floatingChatBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: #E53935;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(229, 57, 53, 0.4);
+  transition: all 0.3s ease;
+  z-index: 99;
+  animation: pulse 2s infinite;
+}
+
+.floatingChatBtn:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 16px rgba(230, 57, 70, 0.5);
+}
+
+.floatingChatBtn:active {
+  transform: scale(0.95);
+}
+
+.floatingChatBtn i {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .floatingChatBtn {
+    width: 50px;
+    height: 50px;
+    bottom: 30px;
+    right: 15px;
+    font-size: 20px;
+  }
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .searchContainer {

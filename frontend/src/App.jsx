@@ -12,6 +12,7 @@ import DishDetail from './modules/customer/dish-detail';
 import Invoice from './modules/customer/invoice';
 import Cart from './modules/customer/cart';
 import Orders from './modules/customer/orders';
+import Messages from './modules/customer/messages';
 
 // Admin imports
 import { AdminAuthProvider } from './contexts/admin/AdminAuthContext';
@@ -136,7 +137,14 @@ function App() {
                   <Route path="dish/:dishId" element={<DishDetail />} />
                   <Route path="cart" element={<Cart />} />
                   <Route path="invoices" element={<Invoice />} />
-                  <Route path="inbox" element={<div style={{padding: '20px'}}>Inbox Page (Coming Soon)</div>} />
+                  <Route 
+                    path="inbox" 
+                    element={
+                      <div style={{ height: 'calc(100vh - 140px)', padding: '16px' }}>
+                        <Messages />
+                      </div>
+                    } 
+                  />
                 </Route>
                 
                 {/* Default Route */}

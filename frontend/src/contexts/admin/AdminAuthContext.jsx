@@ -41,7 +41,6 @@ export const AdminAuthProvider = ({ children }) => {
       setError(null);
 
       const response = await adminAuthApi.login({ email, password });
-
       if (response.success && response.data) {
         const { token: accessToken, refreshToken: refToken, user: userData } = response.data;
 
