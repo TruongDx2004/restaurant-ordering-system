@@ -53,7 +53,7 @@ public class RestaurantConfigEntity {
     @Column(name = "banner_image", length = 255)
     private String bannerImage;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String operatingHours;
 
     @CreationTimestamp

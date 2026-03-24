@@ -15,6 +15,13 @@ export const API_BASE = {
   AUTH: '/auth',
   MESSAGES: '/messages',
   NOTIFICATIONS: '/notifications',
+  RESTAURANT_CONFIG: '/restaurant-config',
+};
+
+// Restaurant Config endpoints
+export const RESTAURANT_CONFIG_ENDPOINTS = {
+  GET: `${API_BASE.RESTAURANT_CONFIG}`,
+  UPDATE: `${API_BASE.RESTAURANT_CONFIG}`,
 };
 
 // Dish endpoints

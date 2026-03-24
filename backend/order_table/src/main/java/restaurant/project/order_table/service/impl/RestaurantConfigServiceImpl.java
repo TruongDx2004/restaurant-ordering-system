@@ -39,7 +39,14 @@ public class RestaurantConfigServiceImpl implements RestaurantConfigService {
         config.setClosingTime(updatedEntity.getClosingTime());
         config.setTaxId(updatedEntity.getTaxId());
         config.setBannerImage(updatedEntity.getBannerImage());
-        config.setOperatingHours(updatedEntity.getOperatingHours());
+        
+        // Fix for MySQL JSON/TEXT truncation error
+        String opHours = updatedEntity.getOperatingHours();
+        if (opHours == null || opHours.trim().isEmpty()) {
+            config.setOperatingHours("{}");
+        } else {
+            config.setOperatingHours(opHours);
+        }
 
         return configRepository.save(config);
     }
