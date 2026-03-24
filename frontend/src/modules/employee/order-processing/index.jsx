@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { invoiceApi, invoiceItemApi, tableApi } from '../../../api';
+import { webSocketService } from '../../../services/webSocketService';
 import styles from './index.module.css';
 
 /**
@@ -13,6 +14,29 @@ const OrderProcessing = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('WAITING'); // WAITING, PREPARING, SERVED, CANCELLED
   const [searchTable, setSearchTable] = useState('');
+
+  // WebSocket Subscriptions
+  useEffect(() => {
+    console.log('[Employee Orders] Subscribing to real-time updates...');
+    
+    // 1. Subscribe to NEW_ORDER
+    const unsubscribeNewOrders = webSocketService.subscribe('/topic/orders', (message) => {
+      console.log('[Employee Orders] New order notification:', message);
+      fetchData(); // Reload all data when a new order comes in
+    });
+
+    // 2. Subscribe to ITEM_STATUS_UPDATE
+    const unsubscribeStatusUpdates = webSocketService.subscribe('/topic/orders/status', (message) => {
+      console.log('[Employee Orders] Status update received:', message);
+      // We could selectively update the state, but fetchData() is safer and simpler for now
+      fetchData();
+    });
+
+    return () => {
+      unsubscribeNewOrders();
+      unsubscribeStatusUpdates();
+    };
+  }, []);
 
   // Tab definitions mapping to backend InvoiceItemStatus
   const TABS = [

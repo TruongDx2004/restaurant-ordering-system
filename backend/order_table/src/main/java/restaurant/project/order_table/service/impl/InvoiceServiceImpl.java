@@ -21,6 +21,7 @@ import restaurant.project.order_table.repository.DishRepository;
 import restaurant.project.order_table.repository.InvoiceRepository;
 import restaurant.project.order_table.repository.TableRepository;
 import restaurant.project.order_table.service.InvoiceService;
+import restaurant.project.order_table.websocket.WebSocketService;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final TableRepository tableRepository;
     private final DishRepository dishRepository;
+    private final WebSocketService webSocketService;
 
     @Override
     public InvoiceEntity createInvoice(InvoiceEntity invoice) {
@@ -82,7 +84,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceEntity updateInvoiceStatus(Long id, InvoiceStatus status) {
         InvoiceEntity invoice = getInvoiceById(id);
         invoice.setStatus(status);
-        return invoiceRepository.save(invoice);
+        InvoiceEntity savedInvoice = invoiceRepository.save(invoice);
+        
+        // Gửi thông báo WebSocket về trạng thái hóa đơn/thanh toán
+        if (savedInvoice.getTable() != null) {
+            webSocketService.sendPaymentNotification(
+                savedInvoice.getId(), 
+                savedInvoice.getTable().getId(), 
+                status.name()
+            );
+        }
+        
+        return savedInvoice;
     }
 
     @Override
@@ -226,6 +239,19 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setTotalAmount(totalAmount);
 
         // Save invoice with updated items
-        return invoiceRepository.save(invoice);
+        InvoiceEntity savedInvoice = invoiceRepository.save(invoice);
+
+        // Gửi thông báo WebSocket
+        webSocketService.sendNewOrderNotification(
+            savedInvoice.getId(), 
+            table.getId(), 
+            "Đơn hàng mới từ bàn " + (table.getTableNumber() != null ? table.getTableNumber() : table.getId())
+        );
+        
+        if (table.getStatus() == TableStatus.OCCUPIED) {
+            webSocketService.sendTableStatusUpdate(table.getId(), "OCCUPIED", null);
+        }
+
+        return savedInvoice;
     }
 }

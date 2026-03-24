@@ -16,6 +16,7 @@ import restaurant.project.order_table.repository.InvoiceItemRepository;
 import restaurant.project.order_table.service.DishService;
 import restaurant.project.order_table.service.InvoiceItemService;
 import restaurant.project.order_table.service.InvoiceService;
+import restaurant.project.order_table.websocket.WebSocketService;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
     private final InvoiceItemRepository invoiceItemRepository;
     private final InvoiceService invoiceService;
     private final DishService dishService;
+    private final WebSocketService webSocketService;
 
     @Override
     public InvoiceItemEntity createInvoiceItem(InvoiceItemEntity invoiceItem) {
@@ -127,6 +129,17 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
         item.setStatus(status);
         item.setUpdatedAt(LocalDateTime.now());
 
-        return invoiceItemRepository.save(item);
+        InvoiceItemEntity savedItem = invoiceItemRepository.save(item);
+        
+        // Gửi thông báo WebSocket
+        if (savedItem.getInvoice() != null) {
+            webSocketService.sendInvoiceItemStatusUpdate(
+                savedItem.getInvoice().getId(), 
+                savedItem.getId(), 
+                status.name()
+            );
+        }
+
+        return savedItem;
     }
 }

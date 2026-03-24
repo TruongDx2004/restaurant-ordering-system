@@ -3,6 +3,7 @@ import { useOrders, useOrderStatus } from './hooks';
 import { OrderItem, StatusOverview } from './components';
 import { DesktopWarning } from '../../../components/shared';
 import storage from '../../../utils/storage';
+import { webSocketService } from '../../../services/webSocketService';
 import styles from './index.module.css';
 
 /**
@@ -14,6 +15,29 @@ const Orders = () => {
   const [tableNumber, setTableNumber] = useState(null);
   const [toast, setToast] = useState(null);
   const [activeTab, setActiveTab] = useState('WAITING');
+
+  // Fetch orders data
+  const { invoice, items, loading, error, refetch } = useOrders(tableNumber, 60000); // Tăng interval polling lên vì đã có WebSocket
+
+  // WebSocket Subscription
+  useEffect(() => {
+    if (!invoice?.id) return;
+
+    console.log(`[Orders] Subscribing to updates for invoice ${invoice.id}`);
+    
+    // Subscribe to status updates
+    const unsubscribe = webSocketService.subscribe('/topic/orders/status', (message) => {
+      console.log('[Orders] Received WebSocket update:', message);
+      
+      // Nếu message liên quan đến invoice hiện tại của khách hàng
+      if (message.orderId === invoice.id) {
+        showToast('Trạng thái món ăn đã được cập nhật!', 'info');
+        refetch(); // Reload data
+      }
+    });
+
+    return () => unsubscribe();
+  }, [invoice?.id, refetch]);
 
   // Get table number from storage
   useEffect(() => {
@@ -27,9 +51,6 @@ const Orders = () => {
       storage.setTableNumber('1');
     }
   }, []);
-
-  // Fetch orders data
-  const { invoice, items, loading, error, refetch } = useOrders(tableNumber, 30000); // Auto-refresh every 30s
 
   // Manage item statuses
   const { 
