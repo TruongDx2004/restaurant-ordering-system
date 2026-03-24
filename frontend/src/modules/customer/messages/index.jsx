@@ -29,7 +29,7 @@ export const Messages = ({ onClose }) => {
     sendMessage,
     callStaff,
     requestBill
-  } = useMessages(tableNumber, invoiceId);
+  } = useMessages(tableNumber, invoiceId, 5000); // Poll every 5 seconds
 
   // Auto scroll to bottom when messages change
   useEffect(() => {

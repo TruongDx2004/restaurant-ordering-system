@@ -48,6 +48,13 @@ const EmployeeLayout = () => {
       description: 'Theo dõi món đang làm'
     },
     {
+      path: '/employee/inbox',
+      icon: 'fa-envelope',
+      label: 'Tin nhắn',
+      shortLabel: 'Inbox',
+      description: 'Hỗ trợ khách hàng'
+    },
+    {
       path: '/employee/tables',
       icon: 'fa-table',
       label: 'Quản lý bàn',
@@ -125,7 +132,6 @@ const EmployeeLayout = () => {
                   {!sidebarCollapsed && (
                     <div className={styles.navItemContent}>
                       <span className={styles.navLabel}>{item.label}</span>
-                      <span className={styles.navDescription}>{item.description}</span>
                     </div>
                   )}
                 </Link>

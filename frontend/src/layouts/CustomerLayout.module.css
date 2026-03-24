@@ -19,7 +19,6 @@
 
 /* ========== LAYOUT CONTAINER ========== */
 .layoutContainer {
-  margin-right: 150px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;

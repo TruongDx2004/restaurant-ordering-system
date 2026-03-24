@@ -29,6 +29,7 @@ import ProtectedEmployeeRoute from './components/ProtectedEmployeeRoute';
 import OrderProcessing from './modules/employee/order-processing';
 import TableManagementEmployee from './modules/employee/table-management';
 import KitchenView from './modules/employee/kitchen';
+import EmployeeInbox from './modules/employee/inbox';
 
 function App() {
   return (
@@ -112,6 +113,7 @@ function App() {
                   <Route path="orders" element={<OrderProcessing />} />
                   <Route path="tables" element={<TableManagementEmployee />} />
                   <Route path="kitchen" element={<KitchenView />} />
+                  <Route path="inbox" element={<EmployeeInbox />} />
                   <Route index element={<Navigate to="orders" replace />} />
                 </Route>
 

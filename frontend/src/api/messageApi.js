@@ -13,7 +13,7 @@ export const messageApi = {
   create: async (messageData) => {
     try {
       const response = await axios.post('/messages', messageData);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('Error creating message:', error);
       throw error;
@@ -28,7 +28,7 @@ export const messageApi = {
   getByInvoice: async (invoiceId) => {
     try {
       const response = await axios.get(`/messages/invoice/${invoiceId}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error getting messages for invoice ${invoiceId}:`, error);
       throw error;
@@ -43,7 +43,7 @@ export const messageApi = {
   getByTable: async (tableId) => {
     try {
       const response = await axios.get(`/messages/table/${tableId}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error getting messages for table ${tableId}:`, error);
       throw error;
@@ -58,7 +58,7 @@ export const messageApi = {
   getByTableOrdered: async (tableId) => {
     try {
       const response = await axios.get(`/messages/table/${tableId}/ordered`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error getting ordered messages for table ${tableId}:`, error);
       throw error;
@@ -81,7 +81,7 @@ export const messageApi = {
         sender
       });
       const response = await axios.post(`/messages/send-to-table?${params.toString()}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error sending message to table ${tableId}:`, error);
       throw error;
