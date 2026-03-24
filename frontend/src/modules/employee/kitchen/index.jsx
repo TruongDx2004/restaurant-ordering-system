@@ -169,10 +169,10 @@ const KitchenView = () => {
                   <span className={styles.quantity}>{item.quantity}x</span>
                 </div>
                 <div className={styles.dishName}>{item.dish?.name || 'Món ăn'}</div>
-                {item.notes && (
+                {item.note && (
                   <div className={styles.notes}>
                     <i className="fas fa-sticky-note"></i>
-                    {item.notes}
+                    {item.note}
                   </div>
                 )}
                 <div className={styles.cardFooter}>
@@ -216,10 +216,10 @@ const KitchenView = () => {
                   <span className={styles.quantity}>{item.quantity}x</span>
                 </div>
                 <div className={styles.dishName}>{item.dish?.name || 'Món ăn'}</div>
-                {item.notes && (
+                {item.note && (
                   <div className={styles.notes}>
                     <i className="fas fa-sticky-note"></i>
-                    {item.notes}
+                    {item.note}
                   </div>
                 )}
                 <div className={styles.cardFooter}>

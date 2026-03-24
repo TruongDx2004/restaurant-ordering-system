@@ -139,7 +139,7 @@ export const Cart = () => {
         items: cartItems.map(item => ({
           dishId: item.id,
           quantity: item.quantity,
-          notes: item.notes || ''
+          notes: item.note || ''
         }))
       };
       
@@ -235,9 +235,9 @@ export const Cart = () => {
                 <div className={styles.itemInfo}>
                   <h3 className={styles.itemName}>{item.name}</h3>
                   <p className={styles.itemPrice}>{formatPrice(item.price)}</p>
-                  {item.notes && (
+                  {item.note && (
                     <p className={styles.itemNotes}>
-                      <i className="fas fa-sticky-note"></i> {item.notes}
+                      <i className="fas fa-sticky-note"></i> {item.note}
                     </p>
                   )}
                 </div>

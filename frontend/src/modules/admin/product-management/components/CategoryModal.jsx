@@ -45,7 +45,7 @@ export const CategoryModal = ({ category, onSave, onClose }) => {
       setLoading(true);
       await onSave(formData);
     } catch (err) {
-      setError(err.response?.data?.message || 'Có lỗi xảy ra');
+      setError(err.message || 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

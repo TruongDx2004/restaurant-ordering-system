@@ -102,6 +102,11 @@ export const categoryApi = {
       throw error;
     }
   },
+
+  // Aliases for compatibility with admin components
+  createCategory: async (categoryData) => categoryApi.create(categoryData),
+  updateCategory: async (id, categoryData) => categoryApi.update(id, categoryData),
+  deleteCategory: async (id) => categoryApi.delete(id),
 };
 
 export default categoryApi;

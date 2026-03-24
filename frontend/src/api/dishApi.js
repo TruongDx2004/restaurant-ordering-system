@@ -166,6 +166,12 @@ export const dishApi = {
       throw error;
     }
   },
+
+  // Aliases for compatibility with admin components
+  createDish: async (dishData) => dishApi.create(dishData),
+  updateDish: async (id, dishData) => dishApi.update(id, dishData),
+  deleteDish: async (id) => dishApi.delete(id),
+  updateDishStatus: async (id, status) => dishApi.updateStatus(id, status),
 };
 
 export default dishApi;
