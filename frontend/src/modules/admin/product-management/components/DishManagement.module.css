@@ -302,9 +302,125 @@
   font-size: 14px;
 }
 
+/*===============================
+IMPORT EXCEL BUTTONS
+================================*/
+.actionGroup {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.exportBtn {
+  background-color: #10b981; /* Xanh lá nhạt */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.exportBtn:hover:not(:disabled) {
+  background-color: #059669; /* Xanh lá đậm khi hover */
+}
+
+.importBtn {
+  background-color: #f59e0b; /* Vàng cam */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.importBtn:hover:not(:disabled) {
+  background-color: #d97706; /* Cam đậm khi hover */
+}
+
+.exportBtn:disabled, .importBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/*================================
+PAGINATION STYLES 
+================================*/
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 30px;
+  padding-bottom: 20px;
+}
+
+.pageBtn {
+  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  color: #475569;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.pageBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageNumbers {
+  display: flex;
+  gap: 8px;
+}
+
+.pageNumberBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.pageNumberBtn:hover {
+  background-color: #f1f5f9;
+}
+
+.pageNumberBtn.activePage {
+  background-color: #3b82f6; /* Màu xanh biển */
+  color: white;
+  border-color: #3b82f6;
+}
+
 /* ========================================
-   RESPONSIVE
-   ======================================== */
+RESPONSIVE
+======================================== */
 
 @media (max-width: 1024px) {
   .toolbar {
