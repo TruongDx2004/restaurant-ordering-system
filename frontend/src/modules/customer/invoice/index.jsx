@@ -61,20 +61,23 @@ const Invoice = () => {
 
   /**
    * Logic gộp món ăn và lấy trạng thái ưu tiên
-   * Ưu tiên: WAITING > PREPARING > SERVED > CANCELLED
+   * Loại bỏ hoàn toàn các món đã hủy (CANCELLED)
+   * Ưu tiên: WAITING > PREPARING > SERVED
    */
   const groupedItems = useMemo(() => {
     if (!items || items.length === 0) return [];
+
+    // Bước 1: Lọc bỏ các món đã hủy trước khi gộp
+    const activeItems = items.filter(item => item.status !== 'CANCELLED');
 
     const grouped = {};
     const statusPriority = {
       'WAITING': 1,
       'PREPARING': 2,
-      'SERVED': 3,
-      'CANCELLED': 4
+      'SERVED': 3
     };
 
-    items.forEach(item => {
+    activeItems.forEach(item => {
       const dishId = item.dish?.id;
       if (!dishId) return;
 

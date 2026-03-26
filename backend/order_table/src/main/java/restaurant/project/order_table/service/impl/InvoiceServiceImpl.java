@@ -18,6 +18,7 @@ import restaurant.project.order_table.entity.enums.InvoiceStatus;
 import restaurant.project.order_table.entity.enums.TableStatus;
 import restaurant.project.order_table.exception.BadRequestException;
 import restaurant.project.order_table.repository.DishRepository;
+import restaurant.project.order_table.repository.InvoiceItemRepository;
 import restaurant.project.order_table.repository.InvoiceRepository;
 import restaurant.project.order_table.repository.TableRepository;
 import restaurant.project.order_table.service.InvoiceService;
@@ -28,6 +29,7 @@ import restaurant.project.order_table.websocket.WebSocketService;
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceItemRepository invoiceItemRepository;
     private final TableRepository tableRepository;
     private final DishRepository dishRepository;
     private final WebSocketService webSocketService;
@@ -115,18 +117,24 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoices.isEmpty() ? null : invoices.get(0);
     }
 
+
     @Override
+    @Transactional
     public BigDecimal calculateInvoiceTotal(Long id) {
-        InvoiceEntity invoice = getInvoiceById(id);
+        InvoiceEntity invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Invoice not found with id: " + id));
         
-        // Calculate total from invoice items
-        BigDecimal total = invoice.getItems().stream()
-                .map(item -> item.getTotalPrice())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Dùng truy vấn SQL trực tiếp để tính tổng tiền (luôn chính xác và bỏ qua món đã hủy)
+        BigDecimal total = invoiceItemRepository.calculateTotalExcludingCancelled(id);
         
-        // Update invoice total amount
+        // Nếu không còn món nào, tổng tiền là 0
+        if (total == null) {
+            total = BigDecimal.ZERO;
+        }
+        
+        // Cập nhật và lưu vào database
         invoice.setTotalAmount(total);
-        invoiceRepository.save(invoice);
+        invoiceRepository.saveAndFlush(invoice);
         
         return total;
     }
