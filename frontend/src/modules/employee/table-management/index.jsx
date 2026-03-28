@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { tableApi } from '../../../api';
+import QuickOrderModal from './components/QuickOrderModal';
 import styles from './index.module.css';
 
 /**
  * Table Management Page for Employees
- * Quản lý trạng thái bàn - Optimized for Mobile
+ * Quản lý trạng thái bàn - Optimized for Mobile with Quick Order
  */
 const TableManagement = () => {
   const [tables, setTables] = useState([]);
@@ -12,6 +13,10 @@ const TableManagement = () => {
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchTable, setSearchTable] = useState('');
+  
+  // Quick order state
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [selectedTable, setSelectedTable] = useState(null);
 
   // Table statuses
   const TABLE_STATUSES = {
@@ -33,7 +38,7 @@ const TableManagement = () => {
         setTables(response.data);
       }
     } catch (err) {
-      setError(err.message || 'Không thể tải dữ liệu');
+      setError(err.message || 'Không thể tải dữ liệu bàn');
     } finally {
       setLoading(false);
     }
@@ -61,6 +66,14 @@ const TableManagement = () => {
     } catch (err) {
       alert('Lỗi: ' + (err.message || 'Không thể cập nhật'));
     }
+  };
+
+  /**
+   * Open order modal
+   */
+  const handleOpenOrder = (table) => {
+    setSelectedTable(table);
+    setShowOrderModal(true);
   };
 
   /**
@@ -171,22 +184,31 @@ const TableManagement = () => {
                 </div>
 
                 <div className={styles.tableActions}>
-                  <select
-                    value={table.status}
-                    onChange={(e) => handleUpdateStatus(table.id, e.target.value)}
-                    className={styles.statusSelect}
-                    style={{ borderColor: statusConfig.color }}
+                  <button 
+                    className={styles.orderBtn}
+                    onClick={() => handleOpenOrder(table)}
+                    disabled={table.status === 'MAINTENANCE'}
                   >
-                    {Object.entries(TABLE_STATUSES).map(([key, config]) => (
-                      <option key={key} value={key}>{config.label}</option>
-                    ))}
-                  </select>
+                    <i className="fas fa-utensils"></i> Gọi món
+                  </button>
                 </div>
               </div>
             );
           })
         )}
       </div>
+
+      {/* Quick Order Modal */}
+      {showOrderModal && selectedTable && (
+        <QuickOrderModal 
+          table={selectedTable}
+          onClose={() => setShowOrderModal(false)}
+          onOrderSuccess={() => {
+            fetchTables();
+            alert('Đặt món thành công cho bàn ' + selectedTable.tableNumber);
+          }}
+        />
+      )}
     </div>
   );
 };

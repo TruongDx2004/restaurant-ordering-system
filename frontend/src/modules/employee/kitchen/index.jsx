@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { invoiceApi, invoiceItemApi } from '../../../api';
+import { webSocketService } from '../../../services/webSocketService';
 import styles from './index.module.css';
 
 /**
@@ -10,6 +11,28 @@ const KitchenView = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // WebSocket Subscriptions
+  useEffect(() => {
+    console.log('[Kitchen View] Subscribing to real-time updates...');
+    
+    // 1. Subscribe to NEW_ORDER
+    const unsubscribeNewOrders = webSocketService.subscribe('/topic/orders', (message) => {
+      console.log('[Kitchen View] New order notification:', message);
+      fetchKitchenItems(); // Reload all items
+    });
+
+    // 2. Subscribe to ITEM_STATUS_UPDATE (to catch changes made by other staff)
+    const unsubscribeStatusUpdates = webSocketService.subscribe('/topic/orders/status', (message) => {
+      console.log('[Kitchen View] Status update received:', message);
+      fetchKitchenItems();
+    });
+
+    return () => {
+      unsubscribeNewOrders();
+      unsubscribeStatusUpdates();
+    };
+  }, []);
 
   const ITEM_STATUSES = {
     WAITING: { label: 'Chờ xử lý', color: '#f39c12', icon: 'fa-clock', priority: 1 },

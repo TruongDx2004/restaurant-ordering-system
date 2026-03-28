@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { SearchProvider } from './contexts/SearchContext';
 import { CategoryProvider } from './contexts/CategoryContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { webSocketService } from './services/webSocketService';
 import { AuthPage } from './modules/customer/auth';
 import CustomerLayout from './layouts/CustomerLayout';
 import CustomerHome from './modules/customer/home';
@@ -32,6 +33,11 @@ import KitchenView from './modules/employee/kitchen';
 import EmployeeInbox from './modules/employee/inbox';
 
 function App() {
+  // Connect to WebSocket on App mount
+  useEffect(() => {
+    webSocketService.connect();
+  }, []);
+
   return (
     <AdminAuthProvider>
       <AuthProvider>

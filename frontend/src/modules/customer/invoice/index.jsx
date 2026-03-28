@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '../orders/hooks';
 import { useInvoicePayment } from './hooks';
 import { InvoiceTable, PaymentSection } from './components';
 import { DesktopWarning } from '../../../components/shared';
 import storage from '../../../utils/storage';
+import { webSocketService } from '../../../services/webSocketService';
 import styles from './index.module.css';
 
 /**
@@ -29,6 +30,88 @@ const Invoice = () => {
 
   // Fetch orders data (reuse hook from orders page)
   const { invoice, items, loading, error, refetch } = useOrders(tableNumber, 0); // No auto-refresh
+
+  // WebSocket Subscription
+  useEffect(() => {
+    if (!invoice?.id) return;
+
+    console.log(`[Invoice] Subscribing to updates for invoice ${invoice.id}`);
+    
+    // 1. Lắng nghe trạng thái thanh toán/hóa đơn
+    const unsubscribePayment = webSocketService.subscribe('/topic/payments', (message) => {
+      console.log('[Invoice] Payment update received:', message);
+      if (message.orderId === invoice.id) {
+        showToast(`Trạng thái hóa đơn: ${message.data}`, 'info');
+        refetch(); // Cập nhật lại UI để đổi màu trạng thái
+      }
+    });
+
+    // 2. Lắng nghe trạng thái món ăn (để cập nhật bảng món ăn)
+    const unsubscribeItems = webSocketService.subscribe('/topic/orders/status', (message) => {
+      if (message.orderId === invoice.id) {
+        refetch();
+      }
+    });
+
+    // 3. Lắng nghe khi có đơn hàng mới từ nhân viên
+    const unsubscribeOders = webSocketService.subscribe('/topic/orders', (message) => {
+      if (message.orderId === invoice.id) {
+        refetch();
+      }
+    });
+
+    return () => {
+      unsubscribePayment();
+      unsubscribeItems();
+      unsubscribeOders();
+    };
+  }, [invoice?.id, refetch]);
+
+  /**
+   * Logic gộp món ăn và lấy trạng thái ưu tiên
+   * Loại bỏ hoàn toàn các món đã hủy (CANCELLED)
+   * Ưu tiên: WAITING > PREPARING > SERVED
+   */
+  const groupedItems = useMemo(() => {
+    if (!items || items.length === 0) return [];
+
+    // Bước 1: Lọc bỏ các món đã hủy trước khi gộp
+    const activeItems = items.filter(item => item.status !== 'CANCELLED');
+
+    const grouped = {};
+    const statusPriority = {
+      'WAITING': 1,
+      'PREPARING': 2,
+      'SERVED': 3
+    };
+
+    activeItems.forEach(item => {
+      const dishId = item.dish?.id;
+      if (!dishId) return;
+
+      if (!grouped[dishId]) {
+        grouped[dishId] = { 
+          ...item, 
+          quantity: 0, 
+          totalPrice: 0 
+        };
+      }
+
+      // Cộng dồn số lượng và giá
+      grouped[dishId].quantity += item.quantity;
+      grouped[dishId].totalPrice += (item.totalPrice || (item.unitPrice * item.quantity));
+
+      // Lấy trạng thái ưu tiên nhất (số nhỏ nhất)
+      const currentPriority = statusPriority[grouped[dishId].status] || 999;
+      const itemPriority = statusPriority[item.status] || 999;
+
+      if (itemPriority < currentPriority) {
+        grouped[dishId].status = item.status;
+      }
+    });
+
+    return Object.values(grouped);
+  }, [items]);
 
   // Payment processing
   const { processPayment, isProcessing, error: paymentError } = useInvoicePayment();
@@ -182,13 +265,13 @@ const Invoice = () => {
       </div>
 
       {/* Invoice Table */}
-      <InvoiceTable items={items} />
+      <InvoiceTable items={groupedItems} />
 
       {/* Payment Section */}
       {invoice.status === 'OPEN' && (
         <PaymentSection
           invoice={invoice}
-          items={items}
+          items={groupedItems}
           onPayment={handlePayment}
           isProcessing={isProcessing}
         />

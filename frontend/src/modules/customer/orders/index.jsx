@@ -3,6 +3,7 @@ import { useOrders, useOrderStatus } from './hooks';
 import { OrderItem, StatusOverview } from './components';
 import { DesktopWarning } from '../../../components/shared';
 import storage from '../../../utils/storage';
+import { webSocketService } from '../../../services/webSocketService';
 import styles from './index.module.css';
 
 /**
@@ -14,6 +15,43 @@ const Orders = () => {
   const [tableNumber, setTableNumber] = useState(null);
   const [toast, setToast] = useState(null);
   const [activeTab, setActiveTab] = useState('WAITING');
+
+  // Fetch orders data
+  const { invoice, items, loading, error, refetch } = useOrders(tableNumber, 60000); // Tăng interval polling lên vì đã có WebSocket
+
+  // WebSocket Subscription
+  useEffect(() => {
+    if (!invoice?.id) return;
+
+    console.log(`[Orders] Subscribing to updates for invoice ${invoice.id}`);
+    
+    // Subscribe to status updates
+    const unsubscribeStatus = webSocketService.subscribe('/topic/orders/status', (message) => {
+      console.log('[Status Orders] Received WebSocket update:', message);
+      
+      // Nếu message liên quan đến invoice hiện tại của khách hàng
+      if (message.orderId === invoice.id) {
+        showToast('Trạng thái món ăn đã được cập nhật!', 'info');
+        refetch(); // Reload data
+      }
+    });
+
+    // Subscribe to new orders
+    const unsubscribeOrders = webSocketService.subscribe('/topic/orders', (message) => {
+      console.log('[New Orders] Received WebSocket new:', message);
+
+      //Nếu message liên quan đến invoice hiện tại của khách hàng
+      if(message.orderId == invoice.id){
+        showToast('Đơn hàng mới đã được cập nhật!', 'info');
+        refetch(); // Reload data
+      }
+    })
+
+    return () => {
+      unsubscribeStatus();
+      unsubscribeOrders();
+    }
+  }, [invoice?.id, refetch]);
 
   // Get table number from storage
   useEffect(() => {
@@ -27,9 +65,6 @@ const Orders = () => {
       storage.setTableNumber('1');
     }
   }, []);
-
-  // Fetch orders data
-  const { invoice, items, loading, error, refetch } = useOrders(tableNumber, 30000); // Auto-refresh every 30s
 
   // Manage item statuses
   const { 
@@ -66,7 +101,7 @@ const Orders = () => {
    * Calculate totals
    */
   const calculateTotals = () => {
-    const subtotal = items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+    const subtotal = items.filter(item => item.status != 'CANCELLED').reduce((sum, item) => sum + (item.totalPrice || 0), 0);
     const serviceFee = subtotal * 0.1; // 10% service fee
     const total = invoice?.totalAmount || (subtotal + serviceFee);
 

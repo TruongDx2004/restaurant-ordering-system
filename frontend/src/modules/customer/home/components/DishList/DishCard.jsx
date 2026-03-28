@@ -50,7 +50,6 @@ export const DishCard = ({ dish }) => {
     // Dispatch custom event to notify other components (like Header/Cart badge)
     window.dispatchEvent(new CustomEvent('cartUpdated'));
     
-    // Simple visual feedback could be added here if needed
   };
 
   return (
