@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { invoiceApi, invoiceItemApi, tableApi } from '../../../api';
+import { webSocketService } from '../../../services/webSocketService';
 import styles from './index.module.css';
 
 /**
@@ -13,6 +14,29 @@ const OrderProcessing = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('WAITING'); // WAITING, PREPARING, SERVED, CANCELLED
   const [searchTable, setSearchTable] = useState('');
+
+  // WebSocket Subscriptions
+  useEffect(() => {
+    console.log('[Employee Orders] Subscribing to real-time updates...');
+    
+    // 1. Subscribe to NEW_ORDER
+    const unsubscribeNewOrders = webSocketService.subscribe('/topic/orders', (message) => {
+      console.log('[Employee Orders] New order notification:', message);
+      fetchData(); // Reload all data when a new order comes in
+    });
+
+    // 2. Subscribe to ITEM_STATUS_UPDATE
+    const unsubscribeStatusUpdates = webSocketService.subscribe('/topic/orders/status', (message) => {
+      console.log('[Employee Orders] Status update received:', message);
+      // We could selectively update the state, but fetchData() is safer and simpler for now
+      fetchData();
+    });
+
+    return () => {
+      unsubscribeNewOrders();
+      unsubscribeStatusUpdates();
+    };
+  }, []);
 
   // Tab definitions mapping to backend InvoiceItemStatus
   const TABS = [
@@ -188,92 +212,94 @@ const OrderProcessing = () => {
       </div>
 
       {/* Content */}
-      {error && <div className={styles.errorMsg}>{error}</div>}
+      <div className={styles.contentArea}>
+        {error && <div className={styles.errorMsg}>{error}</div>}
 
-      <div className={styles.ordersGrid}>
         {filteredData.length === 0 ? (
           <div className={styles.emptyState}>
             <i className="fas fa-clipboard-check"></i>
             <p>Không có đơn hàng nào trong mục này</p>
           </div>
         ) : (
-          filteredData.map(order => (
-            <div key={order.id} className={styles.orderCard}>
-              <div className={styles.orderCardHeader}>
-                <h3>{getTableName(order.table.id)}</h3>
-                <span className={styles.timeLabel}>
-                  {new Date(order.createdAt).toLocaleTimeString('vi-VN', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                </span>
-              </div>
+          <div className={styles.ordersGrid}>
+            {filteredData.map(order => (
+              <div key={order.id} className={styles.orderCard}>
+                <div className={styles.orderCardHeader}>
+                  <h3>{getTableName(order.table.id)}</h3>
+                  <span className={styles.timeLabel}>
+                    {new Date(order.createdAt).toLocaleTimeString('vi-VN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </span>
+                </div>
 
-              <div className={styles.itemList}>
-                {order.items.map(item => (
-                  <div key={item.id} className={styles.itemRow}>
-                    <div className={styles.itemMain}>
-                      <div className={styles.itemName}>
-                        <strong>{item.quantity}x</strong> {item.dish?.name || 'Món ăn'}
-                      </div>
-                      {item.note && (
-                        <div className={styles.itemNote}>
-                          <i className="fas fa-comment-dots"></i> {item.note}
+                <div className={styles.itemList}>
+                  {order.items.map(item => (
+                    <div key={item.id} className={styles.itemRow}>
+                      <div className={styles.itemMain}>
+                        <div className={styles.itemName}>
+                          <strong>{item.quantity}x</strong> {item.dish?.name || 'Món ăn'}
                         </div>
-                      )}
+                        {item.notes && (
+                          <div className={styles.itemNote}>
+                            <i className="fas fa-comment-dots"></i> {item.notes}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className={styles.itemActions}>
+                        {activeTab === 'WAITING' && (
+                          <>
+                            <button 
+                              className={styles.acceptBtn}
+                              onClick={() => handleUpdateStatus(item.id, 'PREPARING')}
+                            >
+                              Nhận
+                            </button>
+                            <button 
+                              className={styles.cancelIconBtn}
+                              onClick={() => {
+                                if(window.confirm('Hủy món này?')) handleUpdateStatus(item.id, 'CANCELLED')
+                              }}
+                              title="Hủy món"
+                            >
+                              <i className="fas fa-times"></i>
+                            </button>
+                          </>
+                        )}
+
+                        {activeTab === 'PREPARING' && (
+                          <>
+                            <button 
+                              className={styles.deliverBtn}
+                              onClick={() => handleUpdateStatus(item.id, 'SERVED')}
+                            >
+                              Giao
+                            </button>
+                            <button 
+                              className={styles.cancelIconBtn}
+                              onClick={() => {
+                                if(window.confirm('Hủy món này?')) handleUpdateStatus(item.id, 'CANCELLED')
+                              }}
+                            >
+                              <i className="fas fa-times"></i>
+                            </button>
+                          </>
+                        )}
+
+                        {(activeTab === 'SERVED' || activeTab === 'CANCELLED') && (
+                          <span className={styles.statusLabel}>
+                            {item.status === 'SERVED' ? 'Đã giao' : 'Đã hủy'}
+                          </span>
+                        )}
+                      </div>
                     </div>
-
-                    <div className={styles.itemActions}>
-                      {activeTab === 'WAITING' && (
-                        <>
-                          <button 
-                            className={styles.acceptBtn}
-                            onClick={() => handleUpdateStatus(item.id, 'PREPARING')}
-                          >
-                            Nhận
-                          </button>
-                          <button 
-                            className={styles.cancelIconBtn}
-                            onClick={() => {
-                              if(window.confirm('Hủy món này?')) handleUpdateStatus(item.id, 'CANCELLED')
-                            }}
-                            title="Hủy món"
-                          >
-                            <i className="fas fa-times"></i>
-                          </button>
-                        </>
-                      )}
-
-                      {activeTab === 'PREPARING' && (
-                        <>
-                          <button 
-                            className={styles.deliverBtn}
-                            onClick={() => handleUpdateStatus(item.id, 'SERVED')}
-                          >
-                            Giao
-                          </button>
-                          <button 
-                            className={styles.cancelIconBtn}
-                            onClick={() => {
-                              if(window.confirm('Hủy món này?')) handleUpdateStatus(item.id, 'CANCELLED')
-                            }}
-                          >
-                            <i className="fas fa-times"></i>
-                          </button>
-                        </>
-                      )}
-
-                      {(activeTab === 'SERVED' || activeTab === 'CANCELLED') && (
-                        <span className={styles.statusLabel}>
-                          {item.status === 'SERVED' ? 'Đã giao' : 'Đã hủy'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>

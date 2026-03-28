@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { tableApi } from '../../../api';
+import React, { useState, useEffect, useRef } from 'react';
+import { tableApi, excelApi } from '../../../api';
 import { TableModal } from './components/TableModal';
 import styles from './index.module.css';
 
@@ -16,11 +16,16 @@ const TableManagement = () => {
   const [filterArea, setFilterArea] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // Load tables
   useEffect(() => {
     loadTables();
-  }, []);
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, filterArea]);
 
   const loadTables = async () => {
     try {
@@ -49,6 +54,11 @@ const TableManagement = () => {
     const matchesArea = filterArea === 'all' || table.area === filterArea;
     return matchesSearch && matchesStatus && matchesArea;
   });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTables = filteredTables.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredTables.length / itemsPerPage);
 
   // Handle create
   const handleCreate = () => {
@@ -134,6 +144,50 @@ const TableManagement = () => {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setIsExcelLoading(true);
+      const response = await excelApi.exportData('table');
+      
+      const blob = new Blob([response.data || response], { type: 'application/vnd.ms-excel' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'tables.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Lỗi khi tải xuống file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsExcelLoading(true);
+      await excelApi.importData('table', file);
+      alert('Import dữ liệu bàn thành công!');
+      await loadTables(); 
+    } catch (err) {
+      alert(err.response?.data || 'Lỗi khi import file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+      event.target.value = ''; 
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -192,10 +246,38 @@ const TableManagement = () => {
           </select>
         </div>
 
-        <button className={styles.createBtn} onClick={handleCreate}>
-          <i className="fas fa-plus"></i>
-          Thêm bàn
-        </button>
+        <div className={styles.actionGroup}>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    accept=".xlsx, .xls" 
+                    style={{ display: 'none' }} 
+                  />
+        
+                  <button 
+                    className={styles.exportBtn}
+                    onClick={handleExportExcel}
+                    disabled={isExcelLoading}
+                  >
+                    <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-export'}`}></i>
+                    Export
+                  </button>
+        
+                  <button 
+                    className={styles.importBtn}
+                    onClick={handleImportClick}
+                    disabled={isExcelLoading}
+                  >
+                    <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-import'}`}></i>
+                    Import
+                  </button>
+        
+                  <button className={styles.createBtn} onClick={handleCreate}>
+                    <i className="fas fa-plus"></i>
+                    Thêm bàn
+                  </button>
+                </div>
       </div>
 
       {/* Stats */}
@@ -226,13 +308,13 @@ const TableManagement = () => {
 
       {/* Table Grid */}
       <div className={styles.tableGrid}>
-        {filteredTables.length === 0 ? (
+        {currentTables.length === 0 ? (
           <div className={styles.emptyState}>
             <i className="fas fa-inbox"></i>
             <p>Không tìm thấy bàn</p>
           </div>
         ) : (
-          filteredTables.map(table => (
+          currentTables.map(table => (
             <div 
               key={table.id} 
               className={`${styles.tableCard} ${styles[getStatusColor(table.status)]}`}
@@ -287,6 +369,38 @@ const TableManagement = () => {
           ))
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={styles.pageBtn}
+          >
+            <i className="fas fa-chevron-left"></i> Trước
+          </button>
+
+          <div className={styles.pageNumbers}>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`${styles.pageNumberBtn} ${currentPage === index + 1 ? styles.activePage : ''}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className={styles.pageBtn}
+          >
+            Sau <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

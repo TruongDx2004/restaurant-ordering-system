@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { userApi } from '../../../api';
+import React, { useState, useEffect, useRef } from 'react';
+import { userApi, excelApi } from '../../../api';
 import { UserModal } from './components/UserModal';
 import styles from './index.module.css';
 
@@ -15,11 +15,16 @@ const UserManagement = () => {
   const [filterRole, setFilterRole] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // Load users
   useEffect(() => {
     loadUsers();
-  }, []);
+    setCurrentPage(1);
+  }, [searchTerm, filterRole]);
 
   const loadUsers = async () => {
     try {
@@ -45,6 +50,11 @@ const UserManagement = () => {
     const matchesRole = filterRole === 'all' || user.role === filterRole;
     return matchesSearch && matchesRole;
   });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   // Handle create
   const handleCreate = () => {
@@ -93,6 +103,50 @@ const UserManagement = () => {
       }
     } catch (err) {
       throw err;
+    }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      setIsExcelLoading(true);
+      const response = await excelApi.exportData('user'); 
+      
+      const blob = new Blob([response.data || response], { type: 'application/vnd.ms-excel' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'users.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Lỗi khi tải xuống file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsExcelLoading(true);
+      await excelApi.importData('user', file);
+      alert('Import dữ liệu người dùng thành công!');
+      await loadUsers();
+    } catch (err) {
+      alert(err.response?.data || 'Lỗi khi import file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+      event.target.value = '';
     }
   };
 
@@ -145,10 +199,38 @@ const UserManagement = () => {
           </select>
         </div>
 
-        <button className={styles.createBtn} onClick={handleCreate}>
-          <i className="fas fa-plus"></i>
-          Thêm người dùng
-        </button>
+        <div className={styles.actionGroup}>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    accept=".xlsx, .xls" 
+                    style={{ display: 'none' }} 
+                  />
+        
+                  <button 
+                    className={styles.exportBtn}
+                    onClick={handleExportExcel}
+                    disabled={isExcelLoading}
+                  >
+                    <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-export'}`}></i>
+                    Export
+                  </button>
+        
+                  <button 
+                    className={styles.importBtn}
+                    onClick={handleImportClick}
+                    disabled={isExcelLoading}
+                  >
+                    <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-import'}`}></i>
+                    Import
+                  </button>
+        
+                  <button className={styles.createBtn} onClick={handleCreate}>
+                    <i className="fas fa-plus"></i>
+                    Thêm người dùng
+                  </button>
+                </div>
       </div>
 
       {/* Stats */}
@@ -185,7 +267,7 @@ const UserManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.length === 0 ? (
+            {currentUsers.length === 0 ? (
               <tr>
                 <td colSpan="6" className={styles.emptyState}>
                   <i className="fas fa-inbox"></i>
@@ -193,7 +275,7 @@ const UserManagement = () => {
                 </td>
               </tr>
             ) : (
-              filteredUsers.map(user => (
+              currentUsers.map(user => (
                 <tr key={user.id}>
                   <td>
                     <div className={styles.userName}>{user.name}</div>
@@ -232,6 +314,24 @@ const UserManagement = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className={styles.pageBtn}>
+            <i className="fas fa-chevron-left"></i> Trước
+          </button>
+          <div className={styles.pageNumbers}>
+            {[...Array(totalPages)].map((_, idx) => (
+              <button key={idx + 1} onClick={() => setCurrentPage(idx + 1)} className={`${styles.pageNumberBtn} ${currentPage === idx + 1 ? styles.activePage : ''}`}>
+                {idx + 1}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className={styles.pageBtn}>
+            Sau <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

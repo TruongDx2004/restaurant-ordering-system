@@ -213,6 +213,8 @@
   resize: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  background-color: #fbfafa;
+  color: #212121;
 }
 
 .notesInput:focus {
