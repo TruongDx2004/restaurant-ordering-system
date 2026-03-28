@@ -5,6 +5,7 @@ public enum MessageType {
     IMAGE,      // Hình ảnh
     QUICK_ACTION,   // Hành động nhanh
     CALL_WAITER,    // Gọi phục vụ
-    SYSTEM    // Hệ thống
+    SYSTEM,    // Hệ thống
+    REQUEST_BILL // Yêu cầu thanh toán 
 }
 

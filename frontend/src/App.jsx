@@ -13,6 +13,7 @@ import DishDetail from './modules/customer/dish-detail';
 import Invoice from './modules/customer/invoice';
 import Cart from './modules/customer/cart';
 import Orders from './modules/customer/orders';
+import Messages from './modules/customer/messages';
 
 // Admin imports
 import { AdminAuthProvider } from './contexts/admin/AdminAuthContext';
@@ -29,6 +30,7 @@ import ProtectedEmployeeRoute from './components/ProtectedEmployeeRoute';
 import OrderProcessing from './modules/employee/order-processing';
 import TableManagementEmployee from './modules/employee/table-management';
 import KitchenView from './modules/employee/kitchen';
+import EmployeeInbox from './modules/employee/inbox';
 
 function App() {
   // Connect to WebSocket on App mount
@@ -117,6 +119,7 @@ function App() {
                   <Route path="orders" element={<OrderProcessing />} />
                   <Route path="tables" element={<TableManagementEmployee />} />
                   <Route path="kitchen" element={<KitchenView />} />
+                  <Route path="inbox" element={<EmployeeInbox />} />
                   <Route index element={<Navigate to="orders" replace />} />
                 </Route>
 
@@ -142,7 +145,14 @@ function App() {
                   <Route path="dish/:dishId" element={<DishDetail />} />
                   <Route path="cart" element={<Cart />} />
                   <Route path="invoices" element={<Invoice />} />
-                  <Route path="inbox" element={<div style={{padding: '20px'}}>Inbox Page (Coming Soon)</div>} />
+                  <Route 
+                    path="inbox" 
+                    element={
+                      <div style={{ height: 'calc(100vh - 140px)', padding: '16px' }}>
+                        <Messages />
+                      </div>
+                    } 
+                  />
                 </Route>
                 
                 {/* Default Route */}

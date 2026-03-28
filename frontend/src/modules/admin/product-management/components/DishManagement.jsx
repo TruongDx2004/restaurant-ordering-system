@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { dishApi, categoryApi } from '../../../../api';
+import React, { useState, useEffect, useRef } from 'react';
+import { dishApi, categoryApi, excelApi } from '../../../../api';
 import { DishModal } from './DishModal';
 import styles from './DishManagement.module.css';
 
@@ -17,11 +17,16 @@ export const DishManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingDish, setEditingDish] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // Load dishes and categories
   useEffect(() => {
     loadData();
-  }, []);
+    setCurrentPage(1);
+  }, [searchTerm, filterCategory, filterStatus]);
 
   const loadData = async () => {
     try {
@@ -53,6 +58,11 @@ export const DishManagement = () => {
     const matchesStatus = filterStatus === 'all' || dish.status === filterStatus;
     return matchesSearch && matchesCategory && matchesStatus;
   });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentDishes = filteredDishes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
 
   // Handle create
   const handleCreate = () => {
@@ -116,6 +126,50 @@ export const DishManagement = () => {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setIsExcelLoading(true);
+      const response = await excelApi.exportData('dish'); // 'dish' là tên entity
+      
+      const blob = new Blob([response.data || response], { type: 'application/vnd.ms-excel' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'dishes.xlsx'); // Tên file tải về
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Lỗi khi tải xuống file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsExcelLoading(true);
+      await excelApi.importData('dish', file); // 'dish' là tên entity
+      alert('Import dữ liệu món ăn thành công!');
+      await loadData(); // Tải lại bảng dữ liệu sau khi import
+    } catch (err) {
+      alert(err.response?.data || 'Lỗi khi import file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+      event.target.value = ''; // Reset input để chọn lại file cũ nếu cần
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -164,10 +218,38 @@ export const DishManagement = () => {
           </select>
         </div>
 
-        <button className={styles.createBtn} onClick={handleCreate}>
-          <i className="fas fa-plus"></i>
-          Thêm món ăn
-        </button>
+        <div className={styles.actionGroup}>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            accept=".xlsx, .xls" 
+            style={{ display: 'none' }} 
+          />
+
+          <button 
+            className={styles.exportBtn}
+            onClick={handleExportExcel}
+            disabled={isExcelLoading}
+          >
+            <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-export'}`}></i>
+            Export
+          </button>
+
+          <button 
+            className={styles.importBtn}
+            onClick={handleImportClick}
+            disabled={isExcelLoading}
+          >
+            <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-import'}`}></i>
+            Import
+          </button>
+
+          <button className={styles.createBtn} onClick={handleCreate}>
+            <i className="fas fa-plus"></i>
+            Thêm món ăn
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -204,7 +286,7 @@ export const DishManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredDishes.length === 0 ? (
+            {currentDishes.length === 0 ? (
               <tr>
                 <td colSpan="6" className={styles.emptyState}>
                   <i className="fas fa-inbox"></i>
@@ -212,7 +294,7 @@ export const DishManagement = () => {
                 </td>
               </tr>
             ) : (
-              filteredDishes.map(dish => (
+              currentDishes.map(dish => (
                 <tr key={dish.id}>
                   <td>
                     <img
@@ -266,6 +348,24 @@ export const DishManagement = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className={styles.pageBtn}>
+            <i className="fas fa-chevron-left"></i> Trước
+          </button>
+          <div className={styles.pageNumbers}>
+            {[...Array(totalPages)].map((_, idx) => (
+              <button key={idx + 1} onClick={() => setCurrentPage(idx + 1)} className={`${styles.pageNumberBtn} ${currentPage === idx + 1 ? styles.activePage : ''}`}>
+                {idx + 1}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className={styles.pageBtn}>
+            Sau <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

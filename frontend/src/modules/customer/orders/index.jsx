@@ -244,10 +244,10 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Floating Action Button - Add More Items */}
+      {/* Floating Action Button - Add More Items
       <a href="/customer/home" className={styles.addMoreBtn}>
         <i className="fas fa-plus"></i>
-      </a>
+      </a> */}
     </div>
     </>
   );

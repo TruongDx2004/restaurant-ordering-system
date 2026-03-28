@@ -284,10 +284,10 @@ export const Cart = () => {
         </>
       )}
 
-      {/* Floating Add Button */}
+      {/* Floating Add Button
       <button onClick={goToMenu} className={styles.addMoreBtn}>
         <i className="fas fa-plus"></i>
-      </button>
+      </button> */}
 
       {/* Confirmation Modal */}
       {showModal && (

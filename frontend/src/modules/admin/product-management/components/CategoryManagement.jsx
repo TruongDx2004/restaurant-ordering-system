@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { categoryApi } from '../../../../api';
+import React, { useState, useEffect, useRef } from 'react';
+import { categoryApi, excelApi } from '../../../../api';
 import { CategoryModal } from './CategoryModal';
 import styles from './CategoryManagement.module.css';
 
@@ -14,11 +14,16 @@ export const CategoryManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // Load categories
   useEffect(() => {
     loadCategories();
-  }, []);
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const loadCategories = async () => {
     try {
@@ -41,6 +46,11 @@ export const CategoryManagement = () => {
     cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     cat.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCategories = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
   // Handle create
   const handleCreate = () => {
@@ -94,6 +104,50 @@ export const CategoryManagement = () => {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setIsExcelLoading(true);
+      const response = await excelApi.exportData('category'); // Đổi thành 'category'
+      
+      const blob = new Blob([response.data || response], { type: 'application/vnd.ms-excel' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'categories.xlsx'); // Đổi tên file tải về
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Lỗi khi tải xuống file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsExcelLoading(true);
+      await excelApi.importData('category', file);
+      alert('Import dữ liệu danh mục thành công!');
+      await loadCategories();
+    } catch (err) {
+      alert(err.response?.data || 'Lỗi khi import file Excel!');
+      console.error(err);
+    } finally {
+      setIsExcelLoading(false);
+      event.target.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -115,7 +169,6 @@ export const CategoryManagement = () => {
 
   return (
     <div className={styles.categoryManagement}>
-      {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.searchBox}>
           <i className="fas fa-search"></i>
@@ -127,10 +180,38 @@ export const CategoryManagement = () => {
           />
         </div>
 
-        <button className={styles.createBtn} onClick={handleCreate}>
-          <i className="fas fa-plus"></i>
-          Thêm danh mục
-        </button>
+        <div className={styles.actionGroup}>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            accept=".xlsx, .xls" 
+            style={{ display: 'none' }} 
+          />
+
+          <button 
+            className={styles.exportBtn}
+            onClick={handleExportExcel}
+            disabled={isExcelLoading}
+          >
+            <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-export'}`}></i>
+            Export
+          </button>
+
+          <button 
+            className={styles.importBtn}
+            onClick={handleImportClick}
+            disabled={isExcelLoading}
+          >
+            <i className={`fas ${isExcelLoading ? 'fa-spinner fa-spin' : 'fa-file-import'}`}></i>
+            Import
+          </button>
+
+          <button className={styles.createBtn} onClick={handleCreate}>
+            <i className="fas fa-plus"></i>
+            Thêm danh mục
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -143,13 +224,13 @@ export const CategoryManagement = () => {
 
       {/* Grid */}
       <div className={styles.categoryGrid}>
-        {filteredCategories.length === 0 ? (
+        {currentCategories.length === 0 ? (
           <div className={styles.emptyState}>
             <i className="fas fa-inbox"></i>
             <p>Không tìm thấy danh mục</p>
           </div>
         ) : (
-          filteredCategories.map(category => (
+          currentCategories.map(category => (
             <div key={category.id} className={styles.categoryCard}>
               <div className={styles.cardHeader}>
                 <h3>{category.name}</h3>
@@ -183,6 +264,24 @@ export const CategoryManagement = () => {
           ))
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className={styles.pageBtn}>
+            <i className="fas fa-chevron-left"></i> Trước
+          </button>
+          <div className={styles.pageNumbers}>
+            {[...Array(totalPages)].map((_, idx) => (
+              <button key={idx + 1} onClick={() => setCurrentPage(idx + 1)} className={`${styles.pageNumberBtn} ${currentPage === idx + 1 ? styles.activePage : ''}`}>
+                {idx + 1}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className={styles.pageBtn}>
+            Sau <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

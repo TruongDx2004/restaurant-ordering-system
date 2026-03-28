@@ -176,7 +176,7 @@ const KitchenView = () => {
       )}
 
       {/* Kitchen Board - Kanban Style (2 columns for WAITING and PREPARING) */}
-      <div className={styles.kitchenBoard} style={{ gridTemplateColumns: '1fr 1fr' }}>
+      <div className={styles.kitchenBoard}>
         {/* Waiting Column */}
         <div className={styles.statusColumn}>
           <div className={styles.columnHeader} style={{ background: ITEM_STATUSES.WAITING.color }}>
