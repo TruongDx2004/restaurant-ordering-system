@@ -53,9 +53,17 @@ const Invoice = () => {
       }
     });
 
+    // 3. Lắng nghe khi có đơn hàng mới từ nhân viên
+    const unsubscribeOders = webSocketService.subscribe('/topic/orders', (message) => {
+      if (message.orderId === invoice.id) {
+        refetch();
+      }
+    });
+
     return () => {
       unsubscribePayment();
       unsubscribeItems();
+      unsubscribeOders();
     };
   }, [invoice?.id, refetch]);
 
