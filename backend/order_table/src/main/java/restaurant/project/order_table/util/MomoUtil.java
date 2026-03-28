@@ -26,10 +26,10 @@ public class MomoUtil {
 	private String secretKey;
 
 	@Value("${momo.redirect-url}")
-	private String redirectUrl; // returnUrl
+	private String redirectUrl;
 
 	@Value("${momo.ipn-url}")
-	private String ipnUrl; // notifyUrl
+	private String ipnUrl;
 
 	@Value("${momo.api-endpoint}")
 	private String apiEndpoint;

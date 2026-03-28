@@ -51,7 +51,8 @@ public class SecurityConfig {
 								"/swagger-ui/**",
 								"/swagger-ui.html",
 								"/api/paymentsonline/momo/ipn",
-								"/api/paymentsonline/momo/callback")
+								"/api/paymentsonline/momo/callback",
+								"/api/paymentsonline/momo/**")
 						.permitAll()
 						// Cho phép tất cả các đường dẫn liên quan đến WebSocket - QUAN TRỌNG!
 						.requestMatchers("/ws/**").permitAll()
