@@ -114,4 +114,21 @@ public class WebSocketService {
         messagingTemplate.convertAndSend("/topic/payments", message);
         log.info("Sent payment notification for invoice {}", invoiceId);
     }
+
+    /**
+     * Send invoice item status update
+     */
+    public void sendInvoiceItemStatusUpdate(Long invoiceId, Long itemId, String status) {
+        WebSocketMessage message = WebSocketMessage.builder()
+                .type("ITEM_STATUS_UPDATE")
+                .sender("SYSTEM")
+                .content("Item " + itemId + " in order " + invoiceId + " status: " + status)
+                .orderId(invoiceId)
+                .data(itemId) // itemId as data or we could send the full object
+                .timestamp(LocalDateTime.now())
+                .build();
+        
+        messagingTemplate.convertAndSend("/topic/orders/status", message);
+        log.info("Sent status update for item {} in order {}", itemId, invoiceId);
+    }
 }

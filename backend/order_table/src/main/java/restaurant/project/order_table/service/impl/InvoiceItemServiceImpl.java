@@ -16,6 +16,7 @@ import restaurant.project.order_table.repository.InvoiceItemRepository;
 import restaurant.project.order_table.service.DishService;
 import restaurant.project.order_table.service.InvoiceItemService;
 import restaurant.project.order_table.service.InvoiceService;
+import restaurant.project.order_table.websocket.WebSocketService;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
     private final InvoiceItemRepository invoiceItemRepository;
     private final InvoiceService invoiceService;
     private final DishService dishService;
+    private final WebSocketService webSocketService;
 
     @Override
     public InvoiceItemEntity createInvoiceItem(InvoiceItemEntity invoiceItem) {
@@ -124,9 +126,48 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
             throw new BadRequestException("Cannot update status of a cancelled item");
         }
 
+        // Lưu lại trạng thái cũ để kiểm tra
+        InvoiceItemStatus oldStatus = item.getStatus();
+        
         item.setStatus(status);
         item.setUpdatedAt(LocalDateTime.now());
 
-        return invoiceItemRepository.save(item);
+        // Lưu món ăn trước
+        InvoiceItemEntity savedItem = invoiceItemRepository.saveAndFlush(item);
+        
+        // Xử lý cập nhật tổng tiền hóa đơn nếu món bị HỦY
+        if (status == InvoiceItemStatus.CANCELLED && oldStatus != InvoiceItemStatus.CANCELLED) {
+            InvoiceEntity invoice = savedItem.getInvoice();
+            if (invoice != null) {
+                // Lấy tổng tiền hiện tại trừ đi tiền món vừa hủy
+                BigDecimal currentTotal = invoice.getTotalAmount();
+                if (currentTotal == null) currentTotal = BigDecimal.ZERO;
+                
+                BigDecimal itemPrice = savedItem.getTotalPrice();
+                if (itemPrice == null) itemPrice = BigDecimal.ZERO;
+                
+                BigDecimal newTotal = currentTotal.subtract(itemPrice);
+                
+                // Đảm bảo tổng tiền không âm (phòng trường hợp dữ liệu sai lệch)
+                if (newTotal.compareTo(BigDecimal.ZERO) < 0) {
+                    newTotal = BigDecimal.ZERO;
+                }
+                
+                invoice.setTotalAmount(newTotal);
+                // Lưu lại hóa đơn với tổng tiền mới
+                invoiceService.updateInvoice(invoice.getId(), invoice);
+            }
+        }
+
+        // Gửi thông báo WebSocket
+        if (savedItem.getInvoice() != null) {
+            webSocketService.sendInvoiceItemStatusUpdate(
+                savedItem.getInvoice().getId(), 
+                savedItem.getId(), 
+                status.name()
+            );
+        }
+
+        return savedItem;
     }
 }

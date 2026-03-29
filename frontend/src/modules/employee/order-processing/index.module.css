@@ -1,9 +1,13 @@
 .orderProcessing {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 1400px;
-  margin: 0 auto;
+  height: 100%; /* Fill mainContent height */
+  width: 100%; /* Fill mainContent width */
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  gap: 20px;
+  background: #f8fafc;
 }
 
 /* ==================== HEADER & SEARCH ==================== */
@@ -12,9 +16,10 @@
   gap: 12px;
   align-items: center;
   background: white;
-  padding: 12px;
+  padding: 12px 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0; /* Keep fixed at top */
 }
 
 .searchBox {
@@ -27,16 +32,16 @@
 .searchBox i {
   position: absolute;
   left: 12px;
-  color: #95a5a6;
+  color: #94a3b8;
 }
 
 .searchBox input {
   width: 100%;
   padding: 10px 10px 10px 36px;
-  border: 1px solid #e0e6ed;
-  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   font-size: 14px;
-  background: #f8f9fa;
+  background: #f8fafc;
   transition: all 0.2s;
 }
 
@@ -50,10 +55,10 @@
 .refreshBtn {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
-  border: none;
-  background: #f8f9fa;
-  color: #7f8c8d;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -62,31 +67,32 @@
 }
 
 .refreshBtn:hover {
-  background: #e0e6ed;
-  color: #2c3e50;
+  background: #f1f5f9;
+  color: #3498db;
   transform: rotate(180deg);
 }
 
 /* ==================== TABS ==================== */
 .tabsContainer {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none; /* Firefox */
+  padding: 4px 2px 8px 2px;
+  flex-shrink: 0; /* Keep fixed at top */
+  scrollbar-width: none;
 }
 
 .tabsContainer::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
 .tabBtn {
   flex: 1;
-  min-width: 100px;
-  padding: 12px 8px;
+  min-width: 110px;
+  padding: 12px 10px;
   background: white;
-  border: none;
-  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -94,23 +100,26 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .tabBtn i {
-  font-size: 18px;
-  color: #95a5a6;
+  font-size: 20px;
+  color: #94a3b8;
 }
 
 .tabBtn span {
-  font-size: 12px;
-  font-weight: 600;
-  color: #7f8c8d;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
   white-space: nowrap;
 }
 
 .tabBtn.active {
+  border-color: var(--accent-color);
   background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .tabBtn.active i,
@@ -122,99 +131,104 @@
   content: '';
   position: absolute;
   bottom: 0;
-  left: 20%;
-  right: 20%;
-  height: 3px;
+  left: 25%;
+  right: 25%;
+  height: 4px;
   background: var(--accent-color);
-  border-radius: 3px 3px 0 0;
+  border-radius: 4px 4px 0 0;
 }
 
 .badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #e74c3c;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
   color: white;
-  font-size: 10px;
-  font-weight: 700;
-  min-width: 18px;
-  height: 18px;
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 20px;
+  height: 20px;
   padding: 0 4px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* ==================== ORDERS GRID ==================== */
+/* ==================== CONTENT AREA ==================== */
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0; /* Critical for flex child scroll */
+  padding-right: 4px; /* Space for scrollbar */
+}
+
 .ordersGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding-bottom: 20px;
 }
 
 .orderCard {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  border: 1px solid #f0f2f5;
+  gap: 16px;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s;
+}
+
+.orderCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .orderCardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed #f0f2f5;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .orderCardHeader h3 {
   margin: 0;
-  font-size: 16px;
-  color: #2c3e50;
-  font-weight: 700;
+  font-size: 18px;
+  color: #1e293b;
+  font-weight: 800;
 }
 
 .timeLabel {
   font-size: 12px;
-  color: #95a5a6;
-  background: #f8f9fa;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 .itemList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .itemRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  align-items: flex-start;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
   gap: 12px;
   transition: all 0.2s;
-}
-
-.itemRow.isReady {
-  background: #e8f5e9;
-  border: 1px solid #c8e6c9;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+  border: 1px solid transparent;
 }
 
 .itemMain {
@@ -223,98 +237,94 @@
 
 .itemName {
   font-size: 14px;
-  color: #2c3e50;
-  line-height: 1.4;
+  color: #334155;
+  line-height: 1.5;
 }
 
 .itemName strong {
   color: #3498db;
-  font-weight: 700;
-  margin-right: 4px;
+  font-weight: 800;
+  margin-right: 6px;
+  font-size: 15px;
 }
 
 .itemNote {
-  font-size: 11px;
-  color: #856404;
-  background: #fff3cd;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 4px;
+  font-size: 12px;
+  color: #92400e;
+  background: #fffbeb;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-top: 6px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  border: 1px solid #fef3c7;
 }
 
 .itemActions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 /* Buttons */
 .acceptBtn,
 .deliverBtn {
-  padding: 6px 16px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+  color: white;
 }
 
 .acceptBtn {
-  background: #f39c12;
-  color: white;
+  background: #f59e0b;
 }
 
 .acceptBtn:hover {
-  background: #e67e22;
+  background: #d97706;
 }
 
 .deliverBtn {
-  background: #27ae60;
-  color: white;
+  background: #10b981;
 }
 
 .deliverBtn:hover {
-  background: #219150;
+  background: #059669;
 }
 
 .cancelIconBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: #f0f2f5;
-  color: #95a5a6;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #fee2e2;
+  background: white;
+  color: #ef4444;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   transition: all 0.2s;
 }
 
 .cancelIconBtn:hover {
-  background: #fee;
-  color: #e74c3c;
-}
-
-.readyBadge {
-  font-size: 11px;
-  font-weight: 700;
-  color: #27ae60;
-  background: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid #27ae60;
+  background: #ef4444;
+  color: white;
 }
 
 .statusLabel {
   font-size: 12px;
-  font-weight: 600;
-  color: #95a5a6;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 /* ==================== STATES ==================== */
@@ -323,8 +333,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100px 20px;
-  color: #7f8c8d;
+  height: 100%;
+  color: #64748b;
   gap: 16px;
 }
 
@@ -334,47 +344,91 @@
 }
 
 .emptyState {
-  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 80px 20px;
-  color: #bdc3c7;
+  color: #94a3b8;
   text-align: center;
-  gap: 12px;
+  gap: 16px;
+  height: 100%;
 }
 
 .emptyState i {
-  font-size: 60px;
+  font-size: 64px;
+  opacity: 0.3;
 }
 
 .emptyState p {
   font-size: 16px;
   margin: 0;
+  font-weight: 600;
 }
 
 .errorMsg {
-  background: #fee;
-  color: #e74c3c;
-  padding: 12px;
-  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 16px;
+  border-radius: 12px;
   text-align: center;
   font-size: 14px;
+  border: 1px solid #fee2e2;
+  margin-bottom: 16px;
 }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
+  .orderProcessing {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .header {
+    padding: 10px 12px;
+  }
+
   .ordersGrid {
     grid-template-columns: 1fr;
   }
   
   .tabBtn {
-    min-width: 80px;
-    padding: 10px 4px;
+    min-width: 90px;
+    padding: 10px 8px;
+  }
+
+  .tabBtn i {
+    font-size: 18px;
+  }
+
+  .tabBtn span {
+    font-size: 11px;
   }
 
   .orderCard {
-    padding: 12px;
+    padding: 16px;
+  }
+
+  .itemRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .itemActions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #e2e8f0;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabBtn {
+    min-width: 80px;
+  }
+  
+  .orderCardHeader h3 {
+    font-size: 16px;
   }
 }

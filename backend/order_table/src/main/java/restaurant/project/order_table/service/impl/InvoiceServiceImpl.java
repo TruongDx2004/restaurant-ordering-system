@@ -18,17 +18,21 @@ import restaurant.project.order_table.entity.enums.InvoiceStatus;
 import restaurant.project.order_table.entity.enums.TableStatus;
 import restaurant.project.order_table.exception.BadRequestException;
 import restaurant.project.order_table.repository.DishRepository;
+import restaurant.project.order_table.repository.InvoiceItemRepository;
 import restaurant.project.order_table.repository.InvoiceRepository;
 import restaurant.project.order_table.repository.TableRepository;
 import restaurant.project.order_table.service.InvoiceService;
+import restaurant.project.order_table.websocket.WebSocketService;
 
 @Service
 @RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceItemRepository invoiceItemRepository;
     private final TableRepository tableRepository;
     private final DishRepository dishRepository;
+    private final WebSocketService webSocketService;
 
     @Override
     public InvoiceEntity createInvoice(InvoiceEntity invoice) {
@@ -82,7 +86,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceEntity updateInvoiceStatus(Long id, InvoiceStatus status) {
         InvoiceEntity invoice = getInvoiceById(id);
         invoice.setStatus(status);
-        return invoiceRepository.save(invoice);
+        InvoiceEntity savedInvoice = invoiceRepository.save(invoice);
+        
+        // Gửi thông báo WebSocket về trạng thái hóa đơn/thanh toán
+        if (savedInvoice.getTable() != null) {
+            webSocketService.sendPaymentNotification(
+                savedInvoice.getId(), 
+                savedInvoice.getTable().getId(), 
+                status.name()
+            );
+        }
+        
+        return savedInvoice;
     }
 
     @Override
@@ -102,18 +117,24 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoices.isEmpty() ? null : invoices.get(0);
     }
 
+
     @Override
+    @Transactional
     public BigDecimal calculateInvoiceTotal(Long id) {
-        InvoiceEntity invoice = getInvoiceById(id);
+        InvoiceEntity invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Invoice not found with id: " + id));
         
-        // Calculate total from invoice items
-        BigDecimal total = invoice.getItems().stream()
-                .map(item -> item.getTotalPrice())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Dùng truy vấn SQL trực tiếp để tính tổng tiền (luôn chính xác và bỏ qua món đã hủy)
+        BigDecimal total = invoiceItemRepository.calculateTotalExcludingCancelled(id);
         
-        // Update invoice total amount
+        // Nếu không còn món nào, tổng tiền là 0
+        if (total == null) {
+            total = BigDecimal.ZERO;
+        }
+        
+        // Cập nhật và lưu vào database
         invoice.setTotalAmount(total);
-        invoiceRepository.save(invoice);
+        invoiceRepository.saveAndFlush(invoice);
         
         return total;
     }
@@ -226,6 +247,19 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setTotalAmount(totalAmount);
 
         // Save invoice with updated items
-        return invoiceRepository.save(invoice);
+        InvoiceEntity savedInvoice = invoiceRepository.save(invoice);
+
+        // Gửi thông báo WebSocket
+        webSocketService.sendNewOrderNotification(
+            savedInvoice.getId(), 
+            table.getId(), 
+            "Đơn hàng mới từ bàn " + (table.getTableNumber() != null ? table.getTableNumber() : table.getId())
+        );
+        
+        if (table.getStatus() == TableStatus.OCCUPIED) {
+            webSocketService.sendTableStatusUpdate(table.getId(), "OCCUPIED", null);
+        }
+
+        return savedInvoice;
     }
 }
