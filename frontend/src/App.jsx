@@ -23,6 +23,7 @@ import ProductManagement from './modules/admin/product-management';
 import UserManagement from './modules/admin/user-management';
 import TableManagement from './modules/admin/table-management';
 import OrderManagement from './modules/admin/order-management';
+import RestaurantSettings from './modules/admin/settings';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import EmployeeLayout from './layouts/EmployeeLayout';
@@ -98,6 +99,17 @@ function App() {
                     <ProtectedAdminRoute>
                       <AdminLayout>
                         <OrderManagement />
+                      </AdminLayout>
+                    </ProtectedAdminRoute>
+                  }
+                />
+
+                <Route
+                  path="/admin/settings"
+                  element={
+                    <ProtectedAdminRoute requiredRole="ADMIN">
+                      <AdminLayout>
+                        <RestaurantSettings />
                       </AdminLayout>
                     </ProtectedAdminRoute>
                   }

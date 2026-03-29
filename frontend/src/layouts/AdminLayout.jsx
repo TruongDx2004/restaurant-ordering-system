@@ -46,7 +46,8 @@ const AdminLayout = ({ children }) => {
       'users': 'Quản lý Users',
       'tables': 'Quản lý Bàn',
       'products': 'Quản lý Sản phẩm',
-      'orders': 'Quản lý Đơn hàng'
+      'orders': 'Quản lý Đơn hàng',
+      'settings': 'Cấu hình nhà hàng'
     };
     return titles[path] || 'Dashboard';
   };
@@ -83,6 +84,12 @@ const AdminLayout = ({ children }) => {
       icon: 'fa-users-cog',
       label: 'Người dùng',
       path: '/admin/users',
+      roles: ['ADMIN']
+    },
+    {
+      icon: 'fa-cog',
+      label: 'Cấu hình',
+      path: '/admin/settings',
       roles: ['ADMIN']
     }
   ];

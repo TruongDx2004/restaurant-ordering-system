@@ -46,6 +46,9 @@ public class SecurityConfig {
                                 // Allow getting dishes and categories
                                 "/api/dishes/**",
                                 "/api/categories/**",
+                                "/api/restaurant-config/**", // Match all restaurant config endpoints
+                                "/uploads/**", // Allow access to uploaded images
+                                "/api/files/**", // Allow file uploads
                                 // Swagger UI endpoints
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
