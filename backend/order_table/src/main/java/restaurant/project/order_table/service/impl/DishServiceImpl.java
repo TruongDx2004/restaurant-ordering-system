@@ -5,20 +5,41 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import restaurant.project.order_table.dto.request.dish.*;
+import restaurant.project.order_table.entity.CategoryEntity;
 import restaurant.project.order_table.entity.DishEntity;
 import restaurant.project.order_table.entity.enums.DishStatus;
 import restaurant.project.order_table.exception.BadRequestException;
 import restaurant.project.order_table.repository.DishRepository;
+import restaurant.project.order_table.service.CategoryService;
 import restaurant.project.order_table.service.DishService;
+import restaurant.project.order_table.util.FileUtil;
 
 @Service
 @RequiredArgsConstructor
 public class DishServiceImpl implements DishService {
 
     private final DishRepository dishRepository;
+    private final CategoryService categoryService;
 
     @Override
-    public DishEntity createDish(DishEntity dish) {
+    public DishEntity createDish(DishCreateRequest request) {
+
+        CategoryEntity category = categoryService.getCategoryById(request.getCategoryId());
+
+        DishEntity dish = DishEntity.builder()
+                .name(request.getName())
+                .price(request.getPrice())
+                .status(request.getStatus())
+                .category(category)
+                .build();
+
+        // 🔥 xử lý image tại đây
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String fileName = FileUtil.saveFile(request.getImage());
+            dish.setImage("/uploads/" + fileName);
+        }
+
         return dishRepository.save(dish);
     }
 
@@ -34,16 +55,24 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public DishEntity updateDish(Long id, DishEntity dish) {
-        DishEntity existingDish = getDishById(id);
+    public DishEntity updateDish(Long id, DishUpdateRequest request) {
 
-        existingDish.setName(dish.getName());
-        existingDish.setPrice(dish.getPrice());
-        existingDish.setImage(dish.getImage());
-        existingDish.setStatus(dish.getStatus());
-        existingDish.setCategory(dish.getCategory());
+        DishEntity existing = getDishById(id);
 
-        return dishRepository.save(existingDish);
+        existing.setName(request.getName());
+        existing.setPrice(request.getPrice());
+        existing.setStatus(request.getStatus());
+
+        CategoryEntity category = categoryService.getCategoryById(request.getCategoryId());
+        existing.setCategory(category);
+        System.out.println("IMAGE: " + request.getImage());
+        // 🔥 xử lý image ở đây
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String fileName = FileUtil.saveFile(request.getImage());
+            existing.setImage("/uploads/" + fileName);
+        }
+
+        return dishRepository.save(existing);
     }
 
     @Override

@@ -24,7 +24,6 @@ public class DishMapper {
                 .name(request.getName())
                 .price(request.getPrice())
                 .status(request.getStatus())
-                .image(request.getImage())
                 .category(category)
                 .build();
     }
@@ -36,7 +35,6 @@ public class DishMapper {
                 .name(request.getName())
                 .price(request.getPrice())
                 .status(request.getStatus())
-                .image(request.getImage())
                 .category(category)
                 .build();
     }
