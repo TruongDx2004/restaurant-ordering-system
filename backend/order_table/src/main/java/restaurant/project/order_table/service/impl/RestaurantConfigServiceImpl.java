@@ -39,6 +39,9 @@ public class RestaurantConfigServiceImpl implements RestaurantConfigService {
         config.setClosingTime(updatedEntity.getClosingTime());
         config.setTaxId(updatedEntity.getTaxId());
         config.setBannerImage(updatedEntity.getBannerImage());
+        config.setBannerImage2(updatedEntity.getBannerImage2());
+        config.setBannerImage3(updatedEntity.getBannerImage3());
+        config.setBannerImage4(updatedEntity.getBannerImage4());
         
         // Fix for MySQL JSON/TEXT truncation error
         String opHours = updatedEntity.getOperatingHours();

@@ -23,5 +23,8 @@ public class RestaurantConfigResponse {
     private LocalTime closingTime;
     private String taxId;
     private String bannerImage;
+    private String bannerImage2;
+    private String bannerImage3;
+    private String bannerImage4;
     private String operatingHours;
 }

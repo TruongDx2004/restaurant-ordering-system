@@ -53,6 +53,15 @@ public class RestaurantConfigEntity {
     @Column(name = "banner_image", length = 255)
     private String bannerImage;
 
+    @Column(name = "banner_image_2", length = 255)
+    private String bannerImage2;
+
+    @Column(name = "banner_image_3", length = 255)
+    private String bannerImage3;
+
+    @Column(name = "banner_image_4", length = 255)
+    private String bannerImage4;
+
     @Column(columnDefinition = "TEXT")
     private String operatingHours;
 
