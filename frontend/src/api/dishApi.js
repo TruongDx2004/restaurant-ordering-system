@@ -106,7 +106,12 @@ export const dishApi = {
     try {
       const response = await axiosInstance.post(
         DISH_ENDPOINTS.CREATE,
-        dishData
+        dishData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
       );
       return response;
     } catch (error) {
@@ -124,7 +129,12 @@ export const dishApi = {
     try {
       const response = await axiosInstance.put(
         DISH_ENDPOINTS.UPDATE(id),
-        dishData
+        dishData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
       );
       return response;
     } catch (error) {
