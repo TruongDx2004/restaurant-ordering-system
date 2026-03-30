@@ -2,6 +2,7 @@ package restaurant.project.order_table.service;
 
 import java.util.List;
 
+import restaurant.project.order_table.dto.request.dish.*;
 import restaurant.project.order_table.entity.DishEntity;
 import restaurant.project.order_table.entity.enums.DishStatus;
 
@@ -13,7 +14,7 @@ public interface DishService {
      * @param dish dish data
      * @return created dish
      */
-    DishEntity createDish(DishEntity dish);
+    DishEntity createDish(DishCreateRequest dish);
 
     /**
      * Get dish by ID
@@ -37,7 +38,7 @@ public interface DishService {
      * @param dish updated dish data
      * @return updated dish
      */
-    DishEntity updateDish(Long id, DishEntity dish);
+    DishEntity updateDish(Long id, DishUpdateRequest dish);
 
     /**
      * Delete dish

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,10 +41,14 @@ public class DishController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<DishResponse> createDish(@Valid @RequestBody DishCreateRequest request) {
-        DishEntity entity = dishMapper.toEntity(request);
-        DishEntity created = dishService.createDish(entity);
-        return ApiResponse.success(dishMapper.toResponse(created), "Dish created successfully");
+    public ApiResponse<DishResponse> createDish(
+            @ModelAttribute DishCreateRequest request) {
+
+        DishEntity created = dishService.createDish(request);
+
+        return ApiResponse.success(
+                dishMapper.toResponse(created),
+                "Dish created successfully");
     }
 
     /**
@@ -70,12 +75,13 @@ public class DishController {
      * Update dish
      */
     @PutMapping("/{id}")
-    public ApiResponse<DishResponse> updateDish(
-            @PathVariable Long id,
-            @Valid @RequestBody DishUpdateRequest request) {
-        DishEntity entity = dishMapper.toEntity(request);
-        DishEntity updated = dishService.updateDish(id, entity);
-        return ApiResponse.success(dishMapper.toResponse(updated), "Dish updated successfully");
+    public ApiResponse<DishResponse> updateDish(@PathVariable Long id,@ModelAttribute DishUpdateRequest request) {
+
+        DishEntity updated = dishService.updateDish(id, request);
+
+        return ApiResponse.success(
+                dishMapper.toResponse(updated),
+                "Dish updated successfully");
     }
 
     /**
