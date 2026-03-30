@@ -14,6 +14,7 @@ const EmployeeInbox = () => {
     messages,
     loading,
     sending,
+    markAsRead,
     sendMessage,
     refreshChat
   } = useEmployeeInbox();
@@ -48,6 +49,11 @@ const EmployeeInbox = () => {
 
   const handleQuickReply = (text) => {
     setInputValue(text);
+  };
+
+  const handleSelectTable = (conv) => {
+    setActiveTable(conv);
+    markAsRead(conv.id);
   };
 
   const formatTime = (dateString) => {
@@ -96,7 +102,7 @@ const EmployeeInbox = () => {
               <div 
                 key={conv.id} 
                 className={`${styles.conversationItem} ${activeTable?.id === conv.id ? styles.activeItem : ''}`}
-                onClick={() => setActiveTable(conv)}
+                onClick={() => handleSelectTable(conv)}
               >
                 <div className={styles.tableAvatar}>{conv.tableNumber}</div>
                 <div className={styles.itemInfo}>
