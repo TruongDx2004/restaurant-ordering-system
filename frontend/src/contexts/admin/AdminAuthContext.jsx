@@ -16,7 +16,7 @@ export const AdminAuthProvider = ({ children }) => {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('adminToken');
+    const storedToken = localStorage.getItem('token');
     const storedRefreshToken = localStorage.getItem('adminRefreshToken');
     const storedUser = localStorage.getItem('adminUser');
 
@@ -41,7 +41,6 @@ export const AdminAuthProvider = ({ children }) => {
       setError(null);
 
       const response = await adminAuthApi.login({ email, password });
-
       if (response.success && response.data) {
         const { token: accessToken, refreshToken: refToken, user: userData } = response.data;
 
@@ -51,7 +50,7 @@ export const AdminAuthProvider = ({ children }) => {
         setUser(userData);
 
         // Save to localStorage
-        localStorage.setItem('adminToken', accessToken);
+        localStorage.setItem('token', accessToken);
         localStorage.setItem('adminRefreshToken', refToken);
         localStorage.setItem('adminUser', JSON.stringify(userData));
 
@@ -86,7 +85,7 @@ export const AdminAuthProvider = ({ children }) => {
       setError(null);
 
       // Clear localStorage
-      localStorage.removeItem('adminToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('adminRefreshToken');
       localStorage.removeItem('adminUser');
     }
@@ -112,7 +111,7 @@ export const AdminAuthProvider = ({ children }) => {
         setUser(userData);
 
         // Update localStorage
-        localStorage.setItem('adminToken', accessToken);
+        localStorage.setItem('token', accessToken);
         localStorage.setItem('adminRefreshToken', refToken);
         localStorage.setItem('adminUser', JSON.stringify(userData));
 

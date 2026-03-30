@@ -17,9 +17,6 @@ export const Cart = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  // Service fee (5%)
-  const SERVICE_FEE_PERCENT = 0.05;
-
   // Load cart from localStorage
   useEffect(() => {
     loadCart();
@@ -60,12 +57,8 @@ export const Cart = () => {
     return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
-  const calculateServiceFee = () => {
-    return calculateSubtotal() * SERVICE_FEE_PERCENT;
-  };
-
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateServiceFee();
+    return calculateSubtotal();
   };
 
   // Format price
@@ -291,10 +284,10 @@ export const Cart = () => {
         </>
       )}
 
-      {/* Floating Add Button */}
+      {/* Floating Add Button
       <button onClick={goToMenu} className={styles.addMoreBtn}>
         <i className="fas fa-plus"></i>
-      </button>
+      </button> */}
 
       {/* Confirmation Modal */}
       {showModal && (

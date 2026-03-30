@@ -17,7 +17,7 @@ const CustomerLayout = () => {
   const [showClearButton, setShowClearButton] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  
+
   // Refs
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
@@ -28,9 +28,9 @@ const CustomerLayout = () => {
   const { categories, loading: categoriesLoading } = useCategories();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Check if current page is profile, cart, or orders (pages without category nav & search)
-  const isSimpleHeaderPage = ['/customer/profile', '/customer/cart', '/customer/orders', '/customer/invoices','/customer/inbox'].includes(location.pathname);
+  const isSimpleHeaderPage = ['/customer/profile', '/customer/cart', '/customer/orders', '/customer/invoices', '/customer/inbox'].includes(location.pathname);
 
   // Get table number from localStorage
   useEffect(() => {
@@ -46,7 +46,7 @@ const CustomerLayout = () => {
       if (!ticking.current) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
-          
+
           // Show header when scrolling up, hide when scrolling down
           if (currentScrollY < lastScrollY.current) {
             // Scrolling up
@@ -55,11 +55,11 @@ const CustomerLayout = () => {
             // Scrolling down and past threshold
             setIsHeaderVisible(false);
           }
-          
+
           lastScrollY.current = currentScrollY;
           ticking.current = false;
         });
-        
+
         ticking.current = true;
       }
     };
@@ -97,7 +97,7 @@ const CustomerLayout = () => {
     e.preventDefault();
     if (searchTerm.trim()) {
       updateSearch(searchTerm.trim());
-      
+
       // Navigate to home if not already there
       if (location.pathname !== '/customer/home') {
         navigate('/customer/home');
@@ -118,7 +118,7 @@ const CustomerLayout = () => {
     clearSearchContext();
     setSearchTerm('');
     setShowClearButton(false);
-    
+
     // If on home page, scroll to category section
     if (location.pathname === '/customer/home') {
       if (categoryId === null) {
@@ -131,7 +131,7 @@ const CustomerLayout = () => {
           const headerOffset = 140; // Offset for sticky header + category nav
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          
+
           window.scrollTo({
             top: offsetPosition,
             behavior: 'smooth'
@@ -184,9 +184,9 @@ const CustomerLayout = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              
-              <button 
-                type="button" 
+
+              <button
+                type="button"
                 className={`${styles.clearSearch} ${showClearButton ? styles.show : ''}`}
                 onClick={handleClearSearch}
               >
@@ -267,7 +267,7 @@ const CustomerLayout = () => {
       </aside>
 
       {/* Overlay */}
-      <div 
+      <div
         className={`${styles.overlay} ${isSidebarOpen ? styles.show : ''}`}
         onClick={closeSidebar}
       ></div>
@@ -276,6 +276,17 @@ const CustomerLayout = () => {
       <main className={styles.mainContent}>
         <Outlet context={{ selectedCategory }} />
       </main>
+
+      {/* Floating Chat Button */}
+      {location.pathname !== '/customer/inbox' && (
+        <div
+          className={styles.floatingChatBtn}
+          onClick={() => navigate('/customer/inbox')}
+          title="Tin nhắn hỗ trợ"
+        >
+          <i className="fas fa-comment-dots"></i>
+        </div>
+      )}
     </div>
   );
 };
