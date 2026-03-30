@@ -33,12 +33,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Skip JWT filter for WebSocket connections
         String path = request.getRequestURI();
 
-        // ⚡ Bỏ qua Swagger
+        // ⚡ Bỏ qua Swagger và các đường dẫn công khai/upload
         if (path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/swagger-resources")
-                || path.startsWith("/webjars")) {
-            System.out.println("Skipping JWT filter for Swagger: " + path);        
+                || path.startsWith("/webjars")
+                || path.startsWith("/api/files")
+                || path.startsWith("/uploads")
+                || path.startsWith("/api/restaurant-config")) {
             filterChain.doFilter(request, response);
             return;
         }

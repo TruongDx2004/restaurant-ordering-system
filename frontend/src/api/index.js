@@ -16,3 +16,5 @@ export { default as adminAuthApi } from './adminAuthApi';
 export { default as userApi } from './userApi';
 export { default as tableApi } from './tableApi';
 export { default as messageApi } from './messageApi';
+export { default as restaurantConfigApi } from './restaurantConfigApi';
+export { default as fileApi } from './fileApi';

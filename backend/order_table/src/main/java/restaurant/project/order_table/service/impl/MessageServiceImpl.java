@@ -13,6 +13,7 @@ import restaurant.project.order_table.exception.BadRequestException;
 import restaurant.project.order_table.repository.MessageRepository;
 import restaurant.project.order_table.service.MessageService;
 import restaurant.project.order_table.service.TableService;
+import restaurant.project.order_table.websocket.WebSocketService;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +21,26 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final TableService tableService;
-
+    private final WebSocketService webSocketService;
     @Override
     public MessageEntity createMessage(MessageEntity message) {
-        return messageRepository.save(message);
+        
+        MessageEntity messageSave = messageRepository.save(message);
+
+        if(messageSave.getSender() == MessageSender.CUSTOMER)
+            webSocketService.sendMessageFromCustomer(
+                messageSave.getTable().getId(),
+                messageSave.getSender(),
+                messageSave.getContent()
+            );
+        else if (messageSave.getSender() == MessageSender.STAFF)
+            webSocketService.sendMessageToTable(
+                messageSave.getTable().getId(),
+                messageSave.getSender(),
+                messageSave.getContent()
+            );
+
+        return messageSave;
     }
 
     @Override

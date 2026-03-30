@@ -50,7 +50,7 @@ export const AdminAuthProvider = ({ children }) => {
         setUser(userData);
 
         // Save to localStorage
-        localStorage.setItem('token', accessToken);
+        localStorage.setItem('adminToken', accessToken);
         localStorage.setItem('adminRefreshToken', refToken);
         localStorage.setItem('adminUser', JSON.stringify(userData));
 
@@ -85,7 +85,7 @@ export const AdminAuthProvider = ({ children }) => {
       setError(null);
 
       // Clear localStorage
-      localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
       localStorage.removeItem('adminRefreshToken');
       localStorage.removeItem('adminUser');
     }

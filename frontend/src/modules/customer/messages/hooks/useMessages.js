@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { messageApi } from '../../../../api';
+import { webSocketService } from '../../../../services/webSocketService';
 
 /**
  * Custom hook for customer messaging
@@ -19,15 +20,15 @@ export const useMessages = (tableId, invoiceId, refreshInterval = 0) => {
 
     try {
       const response = await messageApi.getByTableOrdered(tableId);
-      
+
       if (response && response.success) {
         // Sort by date ASC to ensure newest at bottom
-        const sorted = (response.data || []).sort((a, b) => 
+        const sorted = (response.data || []).sort((a, b) =>
           new Date(a.createdAt) - new Date(b.createdAt)
         );
         setMessages(sorted);
       } else if (Array.isArray(response)) {
-        const sorted = response.sort((a, b) => 
+        const sorted = response.sort((a, b) =>
           new Date(a.createdAt) - new Date(b.createdAt)
         );
         setMessages(sorted);
@@ -37,6 +38,17 @@ export const useMessages = (tableId, invoiceId, refreshInterval = 0) => {
       setError('Không thể tải tin nhắn');
     } finally {
       setLoading(false);
+    }
+  }, [tableId]);
+
+  //Websocket
+  useEffect(() => {
+    if (!tableId) return;
+    const unsubscribe = webSocketService.subscribe('/topic/chat/' + tableId, (message) => {
+      fetchMessages();
+    });
+    return () => {
+      unsubscribe();
     }
   }, [tableId]);
 
@@ -71,7 +83,7 @@ export const useMessages = (tableId, invoiceId, refreshInterval = 0) => {
       };
 
       const response = await messageApi.create(messageData);
-      
+
       if (response && response.success && response.data) {
         setMessages(prev => [...prev, response.data]);
         return { success: true };
@@ -79,7 +91,7 @@ export const useMessages = (tableId, invoiceId, refreshInterval = 0) => {
         setMessages(prev => [...prev, response]);
         return { success: true };
       }
-      
+
       return { success: false, error: 'Phản hồi không hợp lệ' };
     } catch (err) {
       console.error('Error sending message:', err);

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import restaurant.project.order_table.entity.enums.MessageSender;
 
 import java.time.LocalDateTime;
 
@@ -14,14 +15,14 @@ import java.time.LocalDateTime;
 public class WebSocketMessage {
 
     private String type;           // MESSAGE, ORDER, TABLE_STATUS, NOTIFICATION, CHAT
-    private String sender;         // Username or user ID
+    private MessageSender sender;
     private String content;        // Message content
     private Object data;           // Additional data (order, table info, etc.)
     private Long tableId;          // Table ID if relevant
     private Long orderId;          // Order/Invoice ID if relevant
     private LocalDateTime timestamp;
 
-    public WebSocketMessage(String type, String sender, String content) {
+    public WebSocketMessage(String type, MessageSender sender, String content) {
         this.type = type;
         this.sender = sender;
         this.content = content;
