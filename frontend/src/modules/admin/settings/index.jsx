@@ -19,12 +19,21 @@ const RestaurantSettings = () => {
     closingTime: '22:00:00',
     taxId: '',
     bannerImage: '',
+    bannerImage2: '',
+    bannerImage3: '',
+    bannerImage4: '',
     operatingHours: ''
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState({ logo: false, banner: false });
+  const [uploading, setUploading] = useState({ 
+    logo: false, 
+    banner: false, 
+    banner2: false, 
+    banner3: false, 
+    banner4: false 
+  });
   const [message, setMessage] = useState({ type: '', text: '' });
 
   // Base URL for images (Backend server)
@@ -32,7 +41,6 @@ const RestaurantSettings = () => {
   const SERVER_URL = import.meta.env.VITE_SERVER_URL || API_URL.split('/api')[0];
 
   useEffect(() => {
-
     fetchConfig();
   }, []);
 
@@ -85,9 +93,18 @@ const RestaurantSettings = () => {
       const response = await fileApi.upload(file);
       if (response && response.success) {
         const imageUrl = response.data; // This will be "/uploads/filename.ext"
+        
+        const typeMap = {
+          logo: 'logo',
+          banner: 'bannerImage',
+          banner2: 'bannerImage2',
+          banner3: 'bannerImage3',
+          banner4: 'bannerImage4'
+        };
+
         setConfig(prev => ({ 
           ...prev, 
-          [type === 'logo' ? 'logo' : 'bannerImage']: imageUrl 
+          [typeMap[type]]: imageUrl 
         }));
       } else {
         setMessage({ type: 'error', text: 'Không thể tải ảnh lên server.' });
@@ -130,6 +147,8 @@ const RestaurantSettings = () => {
   if (loading) {
     return <div className={styles.loadingOverlay}>Đang tải cấu hình...</div>;
   }
+
+  const isUploading = Object.values(uploading).some(val => val);
 
   return (
     <div className={styles.settingsContainer}>
@@ -176,22 +195,18 @@ const RestaurantSettings = () => {
 
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Số điện thoại</label>
+                <label>Số điện thoại (tối thiểu 10 số)</label>
                 <input 
-                  type="text" 
+                  type="tel" 
                   name="phone" 
                   value={config.phone || ''} 
                   onChange={handleChange} 
                   required 
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Mã số thuế</label>
-                <input 
-                  type="text" 
-                  name="taxId" 
-                  value={config.taxId || ''} 
-                  onChange={handleChange} 
+                  minLength="10"
+                  maxLength="15"
+                  pattern="[0-9]*"
+                  title="Vui lòng nhập số điện thoại hợp lệ (chỉ chứa chữ số, tối thiểu 10 ký tự)"
+                  placeholder="VD: 0123456789"
                 />
               </div>
             </div>
@@ -245,28 +260,6 @@ const RestaurantSettings = () => {
                 placeholder="example@restaurant.com"
               />
             </div>
-
-            <div className={styles.formGroup}>
-              <label>Website</label>
-              <input 
-                type="url" 
-                name="website" 
-                value={config.website || ''} 
-                onChange={handleChange} 
-                placeholder="https://www.restaurant.com"
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Ghi chú giờ hoạt động (Hiển thị cho khách)</label>
-              <input 
-                type="text" 
-                name="operatingHours" 
-                value={config.operatingHours || ''} 
-                onChange={handleChange} 
-                placeholder="VD: Thứ 2 - Chủ nhật: 8:00 - 22:00"
-              />
-            </div>
           </div>
 
           {/* Branding & Media */}
@@ -300,7 +293,7 @@ const RestaurantSettings = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Banner Nhà hàng</label>
+                <label>Hero Banner (Trang chủ)</label>
                 <div className={styles.fileUploadWrapper}>
                   <input 
                     type="file" 
@@ -315,11 +308,90 @@ const RestaurantSettings = () => {
                   </label>
                 </div>
                 <div className={styles.imagePreviewContainer}>
-                  <label>Xem trước Banner:</label>
+                  <label>Xem trước Hero Banner:</label>
                   {config.bannerImage ? (
                     <img src={getFullImageUrl(config.bannerImage)} alt="Banner Preview" className={styles.bannerPreview} />
                   ) : (
                     <div className={styles.bannerPreview}>Chưa có banner</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.promotionTitle}>
+              <h3><i className="fas fa-images"></i> Slides Quảng cáo (Slider)</h3>
+              <p>Các ảnh này sẽ hiển thị trong slider bên dưới Hero Banner</p>
+            </div>
+
+            <div className={styles.bannerRow}>
+              <div className={styles.formGroup}>
+                <label>Slide 1</label>
+                <div className={styles.fileUploadWrapper}>
+                  <input 
+                    type="file" 
+                    id="banner2-upload"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, 'banner2')} 
+                    className={styles.fileInput}
+                  />
+                  <label htmlFor="banner2-upload" className={styles.fileLabel}>
+                    {uploading.banner2 ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cloud-upload-alt"></i>}
+                    {uploading.banner2 ? ' Đang tải...' : ' Chọn Slide 1'}
+                  </label>
+                </div>
+                <div className={styles.imagePreviewContainer}>
+                  {config.bannerImage2 ? (
+                    <img src={getFullImageUrl(config.bannerImage2)} alt="Slide 1 Preview" className={styles.bannerPreviewSmall} />
+                  ) : (
+                    <div className={styles.bannerPreviewSmall}>Chưa có slide 1</div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Slide 2</label>
+                <div className={styles.fileUploadWrapper}>
+                  <input 
+                    type="file" 
+                    id="banner3-upload"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, 'banner3')} 
+                    className={styles.fileInput}
+                  />
+                  <label htmlFor="banner3-upload" className={styles.fileLabel}>
+                    {uploading.banner3 ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cloud-upload-alt"></i>}
+                    {uploading.banner3 ? ' Đang tải...' : ' Chọn Slide 2'}
+                  </label>
+                </div>
+                <div className={styles.imagePreviewContainer}>
+                  {config.bannerImage3 ? (
+                    <img src={getFullImageUrl(config.bannerImage3)} alt="Slide 2 Preview" className={styles.bannerPreviewSmall} />
+                  ) : (
+                    <div className={styles.bannerPreviewSmall}>Chưa có slide 2</div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Slide 3</label>
+                <div className={styles.fileUploadWrapper}>
+                  <input 
+                    type="file" 
+                    id="banner4-upload"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, 'banner4')} 
+                    className={styles.fileInput}
+                  />
+                  <label htmlFor="banner4-upload" className={styles.fileLabel}>
+                    {uploading.banner4 ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cloud-upload-alt"></i>}
+                    {uploading.banner4 ? ' Đang tải...' : ' Chọn Slide 3'}
+                  </label>
+                </div>
+                <div className={styles.imagePreviewContainer}>
+                  {config.bannerImage4 ? (
+                    <img src={getFullImageUrl(config.bannerImage4)} alt="Slide 3 Preview" className={styles.bannerPreviewSmall} />
+                  ) : (
+                    <div className={styles.bannerPreviewSmall}>Chưa có slide 3</div>
                   )}
                 </div>
               </div>
@@ -331,7 +403,7 @@ const RestaurantSettings = () => {
           <button type="button" onClick={fetchConfig} className={styles.cancelButton}>
             Hủy thay đổi
           </button>
-          <button type="submit" className={styles.saveButton} disabled={saving || uploading.logo || uploading.banner}>
+          <button type="submit" className={styles.saveButton} disabled={saving || isUploading}>
             {saving ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-save"></i>}
             {saving ? ' Đang lưu...' : ' Lưu cấu hình'}
           </button>

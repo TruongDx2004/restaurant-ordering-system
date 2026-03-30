@@ -21,6 +21,9 @@ public class RestaurantConfigMapper {
                 .closingTime(request.getClosingTime())
                 .taxId(request.getTaxId())
                 .bannerImage(request.getBannerImage())
+                .bannerImage2(request.getBannerImage2())
+                .bannerImage3(request.getBannerImage3())
+                .bannerImage4(request.getBannerImage4())
                 .operatingHours(request.getOperatingHours())
                 .build();
     }
@@ -41,6 +44,9 @@ public class RestaurantConfigMapper {
                 .closingTime(entity.getClosingTime())
                 .taxId(entity.getTaxId())
                 .bannerImage(entity.getBannerImage())
+                .bannerImage2(entity.getBannerImage2())
+                .bannerImage3(entity.getBannerImage3())
+                .bannerImage4(entity.getBannerImage4())
                 .operatingHours(entity.getOperatingHours())
                 .build();
     }
