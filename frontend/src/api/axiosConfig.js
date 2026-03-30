@@ -15,7 +15,6 @@ const axiosInstance = axios.create({
 // Request interceptor - Thêm token vào header nếu có
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Lấy token từ localStorage (ưu tiên adminToken nếu đang ở trang admin)
     const isAdminPath = window.location.pathname.startsWith('/admin') || 
                         window.location.pathname.startsWith('/employee');
     
@@ -24,11 +23,8 @@ axiosInstance.interceptors.request.use(
       token = localStorage.getItem('adminToken');
     }
     
-    // Nếu không có adminToken hoặc không phải path admin, thử các key khác
     if (!token) {
-      token = localStorage.getItem('token') || 
-              localStorage.getItem('accessToken') || 
-              localStorage.getItem('adminToken'); // Fallback
+      token = localStorage.getItem('token');
     }
     
     if (token) {

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import restaurant.project.order_table.entity.enums.MessageSender;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +22,7 @@ public class WebSocketService {
     public void sendGlobalNotification(String type, String content, Object data) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type(type)
-                .sender("SYSTEM")
+                .sender(MessageSender.SYSTEM)
                 .content(content)
                 .data(data)
                 .timestamp(LocalDateTime.now())
@@ -37,7 +38,7 @@ public class WebSocketService {
     public void sendNewOrderNotification(Long orderId, Long tableId, String content) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type("NEW_ORDER")
-                .sender("SYSTEM")
+                .sender(MessageSender.SYSTEM)
                 .content(content)
                 .orderId(orderId)
                 .tableId(tableId)
@@ -54,7 +55,7 @@ public class WebSocketService {
     public void sendTableStatusUpdate(Long tableId, String status, Object data) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type("TABLE_STATUS_UPDATE")
-                .sender("SYSTEM")
+                .sender(MessageSender.SYSTEM)
                 .content("Table " + tableId + " status: " + status)
                 .tableId(tableId)
                 .data(data)
@@ -68,7 +69,7 @@ public class WebSocketService {
     /**
      * Send message to specific table
      */
-    public void sendMessageToTable(Long tableId, String sender, String content) {
+    public void sendMessageToTable(Long tableId, MessageSender sender, String content) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type("CHAT_MESSAGE")
                 .sender(sender)
@@ -82,12 +83,27 @@ public class WebSocketService {
     }
 
     /**
+     * Send message from customer
+     */
+    public void sendMessageFromCustomer(Long tableId, MessageSender sender, String content){
+        WebSocketMessage message = WebSocketMessage.builder()
+                .type("CHAT_MESSAGE")
+                .sender(sender)
+                .content(content)
+                .tableId(tableId)
+                .timestamp(LocalDateTime.now())
+                .build();
+        
+        messagingTemplate.convertAndSend("/topic/chat/customer", message);
+        log.info("Senmessage from customer {} : {}", tableId, content);
+    }
+    /**
      * Send notification to specific user
      */
     public void sendNotificationToUser(String username, String type, String content, Object data) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type(type)
-                .sender("SYSTEM")
+                .sender(MessageSender.SYSTEM)
                 .content(content)
                 .data(data)
                 .timestamp(LocalDateTime.now())
@@ -103,7 +119,7 @@ public class WebSocketService {
     public void sendPaymentNotification(Long invoiceId, Long tableId, String status) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type("PAYMENT_STATUS")
-                .sender("SYSTEM")
+                .sender(MessageSender.SYSTEM)
                 .content("Payment " + status + " for table " + tableId)
                 .orderId(invoiceId)
                 .tableId(tableId)
@@ -121,7 +137,7 @@ public class WebSocketService {
     public void sendInvoiceItemStatusUpdate(Long invoiceId, Long itemId, String status) {
         WebSocketMessage message = WebSocketMessage.builder()
                 .type("ITEM_STATUS_UPDATE")
-                .sender("SYSTEM")
+                .sender(MessageSender.SYSTEM)
                 .content("Item " + itemId + " in order " + invoiceId + " status: " + status)
                 .orderId(invoiceId)
                 .data(itemId) // itemId as data or we could send the full object

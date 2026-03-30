@@ -9,6 +9,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import restaurant.project.order_table.entity.enums.MessageSender;
 
 @Component
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class WebSocketEventListener {
             
             WebSocketMessage message = WebSocketMessage.builder()
                     .type("LEAVE")
-                    .sender(username)
+                    .sender(MessageSender.SYSTEM)
                     .content(username + " left the chat")
                     .build();
             
