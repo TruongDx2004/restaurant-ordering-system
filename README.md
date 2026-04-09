@@ -1,43 +1,100 @@
-## 4. Đánh giá việc sử dụng các công cụ và môi trường phát triển
+# Hệ Thống Gọi Món Tại Bàn Thông Minh
 
-Trong quá trình thực hiện dự án, nhóm đã áp dụng nhiều công cụ và môi trường phát triển hiện đại nhằm hỗ trợ quản lý dự án, thiết kế hệ thống, kiểm thử và triển khai phần mềm. Việc sử dụng các công cụ này mang lại nhiều lợi ích rõ rệt, đồng thời cũng tồn tại một số hạn chế nhất định trong quá trình áp dụng thực tế.
+## 1. Tổng quan
 
-### 4.1. Ưu điểm
-
-Việc sử dụng các công cụ như Jira, Balsamiq, Postman, GitHub Actions và GitHub giúp nhóm xây dựng được một quy trình phát triển phần mềm bài bản và chuyên nghiệp hơn.
-
-- **Jira** hỗ trợ quản lý công việc theo mô hình Agile/Scrum, giúp nhóm dễ dàng lập kế hoạch Sprint, phân chia nhiệm vụ, theo dõi tiến độ và kiểm soát khối lượng công việc của từng thành viên.
-
-- **Balsamiq** hỗ trợ phác thảo giao diện nhanh chóng, giúp nhóm thống nhất thiết kế trước khi triển khai frontend, từ đó hạn chế sửa đổi lớn trong quá trình lập trình.
-
-- **Postman** cho phép kiểm thử API độc lập với frontend, giúp phát hiện lỗi backend sớm và tăng tốc độ debug trong quá trình phát triển.
-
-- **GitHub** hỗ trợ quản lý mã nguồn tập trung, kiểm soát phiên bản hiệu quả và tạo môi trường làm việc nhóm chuyên nghiệp thông qua branch, pull request và code review.
-
-- **GitHub Actions** giúp tự động hóa quy trình kiểm tra và triển khai hệ thống, giảm thiểu thao tác thủ công và nâng cao độ ổn định của sản phẩm.
-
-Ngoài ra, việc áp dụng đồng bộ các công cụ trên giúp nhóm tiếp cận gần hơn với quy trình phát triển phần mềm thực tế tại doanh nghiệp, nâng cao kỹ năng làm việc nhóm và tư duy kỹ thuật.
+Smart Table Ordering System là giải pháp dành cho nhà hàng, cho phép khách hàng gọi món trực tiếp tại bàn thông qua QR Code hoặc thiết bị IoT hỗ trợ giọng nói. Hệ thống giúp tối ưu quy trình phục vụ, giảm tải cho nhân viên và nâng cao trải nghiệm khách hàng.
 
 ---
 
-### 4.2. Nhược điểm
+## 2. Vấn đề
 
-Bên cạnh các lợi ích đạt được, quá trình sử dụng công cụ và môi trường phát triển cũng gặp phải một số khó khăn:
+Quy trình gọi món truyền thống gặp nhiều hạn chế:
 
-- Một số công cụ như Jira và GitHub Actions có độ phức tạp cao đối với thành viên chưa có kinh nghiệm, đòi hỏi thời gian học tập và làm quen tương đối nhiều.
-
-- Việc cấu hình ban đầu cho các công cụ như GitHub Actions hoặc Jira workflow mất nhiều thời gian để tối ưu và đồng bộ với quy trình làm việc của nhóm.
-
-- Sử dụng nhiều công cụ cùng lúc có thể làm tăng độ phức tạp trong quản lý nếu không có quy chuẩn thống nhất.
-
-- Một số tính năng nâng cao của các công cụ yêu cầu phiên bản trả phí, gây hạn chế khi áp dụng cho dự án sinh viên hoặc nhóm nhỏ.
-
-- Khi tích hợp nhiều công cụ trong cùng quy trình phát triển, việc đồng bộ dữ liệu và duy trì workflow nhất quán giữa các thành viên cần được quản lý chặt chẽ để tránh sai lệch.
+* Khách hàng phải chờ nhân viên ghi nhận đơn
+* Dễ xảy ra sai sót khi ghi order
+* Giao tiếp giữa bàn và bếp không hiệu quả
+* Không có cập nhật trạng thái đơn hàng theo thời gian thực
 
 ---
 
-### 4.3. Tổng kết đánh giá
+## 3. Giải pháp
 
-Nhìn chung, việc áp dụng các công cụ và môi trường phát triển hiện đại đã giúp nhóm nâng cao chất lượng sản phẩm, tối ưu quy trình làm việc và tiếp cận gần hơn với mô hình phát triển phần mềm chuyên nghiệp trong thực tế doanh nghiệp.
+![alt text](docs/images/giaiphap.png)
 
-Mặc dù vẫn tồn tại một số khó khăn trong quá trình làm quen và cấu hình, nhưng những lợi ích mà các công cụ mang lại là rất đáng kể và phù hợp với định hướng phát triển lâu dài của dự án.
+Hệ thống cung cấp:
+
+* Gọi món qua QR Code hoặc thiết bị IoT tại bàn
+* Hỗ trợ gọi món bằng giọng nói thông qua AI
+* Đơn hàng được gửi trực tiếp đến bếp theo thời gian thực
+* Nhân viên có thể theo dõi và quản lý đơn hàng dễ dàng
+
+---
+
+## 4. Tính năng chính
+### Thiết bị ESP32 S3 - Chatbot
+![alt text](docs/images/chucnang.png)
+
+### Trang web gọi món tại bàn
+![alt text](docs/images/goimon.png)
+![alt text](docs/images/donhang.png)
+![alt text](docs/images/baoban.png)
+
+* Gọi món bằng QR Code
+* Tích hợp thiết bị IoT điều khiển bằng giọng nói
+* Cập nhật đơn hàng real-time bằng WebSocket
+* Xác thực và phân quyền (Admin, Staff)
+* Quản lý menu và danh mục món
+* Theo dõi trạng thái đơn hàng
+* Gọi món bằng AI (tích hợp MCP)
+* Tích hợp thanh toán online
+* Gửi tính hiệu cảnh báo khẩn cấp
+
+
+---
+
+## 5. Kiến trúc hệ thống
+
+Hệ thống gồm 3 thành phần chính:
+
+### Backend
+
+* RESTful API xây dựng bằng Spring Boot
+* Bảo mật bằng JWT và phân quyền người dùng
+* WebSocket cho giao tiếp thời gian thực
+
+### Frontend
+
+* Dashboard cho admin và nhân viên
+
+### IoT
+
+* Thiết bị thông minh (ESP32, tablet, ...)
+* Nhận lệnh giọng nói và gửi về hệ thống
+
+---
+
+## 6. Công nghệ sử dụng
+
+![alt text](docs/images/congnghe.png)
+
+* Backend: Spring Boot, Spring Security, JWT
+* Real-time: WebSocket
+* Database: MySQL
+* AI: Model Context Protocol (MCP)/ LLM DeepSeek
+* IoT: ESP32 / thiết bị thông minh
+
+---
+
+## 7. Hướng phát triển
+
+![alt text](docs/images/huongphattrien.png)
+
+* Dashboard phân tích dữ liệu
+* Hỗ trợ đa ngôn ngữ
+* Phát triển mobile app cho khách hàng
+
+---
+
+Được phát triển bởi 
+Đoàn Xuân Trường
+doanxuantruong2110@gmail.com
