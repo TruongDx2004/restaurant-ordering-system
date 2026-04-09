@@ -18,6 +18,12 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Debug Repository
+        run: |
+          pwd
+          ls -la
+          find . -name "pom.xml"
+
       - name: Build Project
         run: mvn clean package
 
