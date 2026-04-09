@@ -29,7 +29,7 @@ export const Messages = ({ onClose }) => {
     sendMessage,
     callStaff,
     requestBill
-  } = useMessages(tableNumber, invoiceId, 5000); // Poll every 5 seconds
+  } = useMessages(tableNumber, invoiceId);
 
   // Auto scroll to bottom when messages change
   useEffect(() => {
@@ -53,13 +53,14 @@ export const Messages = ({ onClose }) => {
   };
 
   const formatTime = (dateString) => {
+    if (!dateString) return new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     const date = new Date(dateString);
     return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
   };
 
   const quickActions = [
     { text: 'Gọi nhân viên', type: 'CALL_WAITER' },
-    { text: 'Thanh toán', type: 'REQUEST_BILL' },
+    { text: 'Thêm đồ ăn kèm', type: 'QUICK_ACTION' },
     { text: 'Thêm nước đá', type: 'QUICK_ACTION' },
     { text: 'Thêm khăn giấy', type: 'QUICK_ACTION' },
     { text: 'Đổi bàn', type: 'QUICK_ACTION' }
@@ -93,7 +94,7 @@ export const Messages = ({ onClose }) => {
             <div className={styles.emptyIcon}>
               <i className="fas fa-receipt"></i>
             </div>
-            <p>Vui lòng đặt món để bắt đầu trò chuyện với nhân viên</p>
+            <p>Vui lòng đặt món để bắt đầu hỗ trợ trực tuyến</p>
           </div>
         ) : loading && messages.length === 0 ? (
           <div className={styles.loadingOverlay}>
@@ -105,11 +106,11 @@ export const Messages = ({ onClose }) => {
             <div className={styles.emptyIcon}>
               <i className="fas fa-comments"></i>
             </div>
-            <p>Bắt đầu cuộc trò chuyện với nhân viên</p>
+            <p>Gửi tin nhắn để bắt đầu trò chuyện với chúng tôi</p>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className={`${styles.messageWrapper} ${getMessageClass(msg)}`}>
+          messages.map((msg, idx) => (
+            <div key={msg.id || idx} className={`${styles.messageWrapper} ${getMessageClass(msg)}`}>
               <div className={`${styles.messageBubble} ${getBubbleClass(msg)}`}>
                 {msg.content}
               </div>

@@ -115,4 +115,24 @@ public interface PaymentService {
      * @return updated payment
      */
     PaymentEntity cancelPayment(Long id);
+
+    /**
+     * Yêu cầu thanh toán tiền mặt – gửi thông báo tới nhân viên, chưa tạo Payment.
+     * (tương đương RequestCashPayment trong JS)
+     *
+     * @param invoiceId invoice ID
+     * @param tableId   table ID
+     * @param amount    số tiền cần thanh toán
+     */
+    void requestCashPayment(Long invoiceId, Long tableId, BigDecimal amount);
+
+    /**
+     * Xác nhận thanh toán theo invoiceId – upsert Payment, cập nhật invoice + bàn.
+     * (tương đương ConfirmPaymentByInvoice trong JS)
+     *
+     * @param invoiceId       invoice ID
+     * @param transactionCode mã giao dịch (null = tự sinh)
+     * @return payment entity
+     */
+    PaymentEntity confirmPaymentByInvoice(Long invoiceId, String transactionCode);
 }

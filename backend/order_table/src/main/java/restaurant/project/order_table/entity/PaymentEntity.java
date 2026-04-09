@@ -1,19 +1,22 @@
 package restaurant.project.order_table.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import restaurant.project.order_table.entity.enums.PaymentMethod;
 import restaurant.project.order_table.entity.enums.PaymentStatus;
 
 @Entity
 @Table(name = "payments")
+@SQLDelete(sql = "UPDATE payments SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,21 +36,35 @@ public class PaymentEntity {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    /** Phương thức */
+    /** Phương thức (CASH / VNPAY / MOMO) */
     @Enumerated(EnumType.STRING)
     @Column(name = "method", nullable = false)
     private PaymentMethod method;
 
-    /** Trạng thái */
+    /** Trạng thái (PENDING / SUCCESS / FAILED) */
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
-    /** Thời điểm thanh toán */
-    @Column(name = "paid_at", nullable = false)
+    /** Thời điểm thanh toán – nullable (chưa thanh toán = null) */
+    @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
-    /** Mã giao dịch (VNPay, Momo...) */
+    /** Mã giao dịch (VNPay, MoMo…) */
     @Column(name = "transaction_code", length = 255)
     private String transactionCode;
+
+    /** Thời điểm tạo */
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    /** Thời điểm cập nhật */
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    /** Soft delete */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

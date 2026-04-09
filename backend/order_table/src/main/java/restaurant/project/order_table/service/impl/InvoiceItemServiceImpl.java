@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -11,11 +13,13 @@ import restaurant.project.order_table.entity.DishEntity;
 import restaurant.project.order_table.entity.InvoiceEntity;
 import restaurant.project.order_table.entity.InvoiceItemEntity;
 import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
+import restaurant.project.order_table.entity.enums.RecipientType;
 import restaurant.project.order_table.exception.BadRequestException;
 import restaurant.project.order_table.repository.InvoiceItemRepository;
 import restaurant.project.order_table.service.DishService;
 import restaurant.project.order_table.service.InvoiceItemService;
 import restaurant.project.order_table.service.InvoiceService;
+import restaurant.project.order_table.service.NotificationService;
 import restaurant.project.order_table.websocket.WebSocketService;
 
 @Service
@@ -26,6 +30,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
     private final InvoiceService invoiceService;
     private final DishService dishService;
     private final WebSocketService webSocketService;
+    private final NotificationService notificationService;
 
     @Override
     public InvoiceItemEntity createInvoiceItem(InvoiceItemEntity invoiceItem) {
@@ -87,6 +92,9 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 
         InvoiceItemEntity invoiceItem = getInvoiceItemById(id);
         invoiceItem.setQuantity(quantity);
+        // Tính lại totalPrice theo unitPrice hiện tại
+        BigDecimal totalPrice = invoiceItem.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
+        invoiceItem.setTotalPrice(totalPrice);
         return invoiceItemRepository.save(invoiceItem);
     }
 
@@ -110,7 +118,18 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
         invoiceItem.setUnitPrice(unitPrice);
         invoiceItem.setTotalPrice(totalPrice);
 
-        return invoiceItemRepository.save(invoiceItem);
+        InvoiceItemEntity saved = invoiceItemRepository.save(invoiceItem);
+
+        // Gửi thông báo "Món mới được gọi" cho nhân viên
+        notificationService.createAndSend(
+            RecipientType.USER, 0L,
+            "Món mới được gọi",
+            "Bàn " + invoice.getTable().getId() + " gọi " + quantity + "x " + dish.getName(),
+            "NEW_ORDER",
+            Map.of("invoiceId", invoiceId, "tableId", invoice.getTable().getId())
+        );
+
+        return saved;
     }
 
     @Override

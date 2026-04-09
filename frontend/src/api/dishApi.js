@@ -106,12 +106,7 @@ export const dishApi = {
     try {
       const response = await axiosInstance.post(
         DISH_ENDPOINTS.CREATE,
-        dishData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
+        dishData
       );
       return response;
     } catch (error) {
@@ -126,20 +121,17 @@ export const dishApi = {
    * @returns {Promise} Response với dish đã cập nhật
    */
   update: async (id, dishData) => {
-    try {
-      const response = await axiosInstance.put(
-        DISH_ENDPOINTS.UPDATE(id),
-        dishData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const isFormData = dishData instanceof FormData;
+
+    const response = await axiosInstance.put(
+      DISH_ENDPOINTS.UPDATE(id),
+      dishData,
+      isFormData
+        ? { headers: { "Content-Type": "multipart/form-data" } }
+        : {}
+    );
+
+    return response;
   },
 
   /**

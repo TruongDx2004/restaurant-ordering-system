@@ -1,72 +1,66 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { messageApi } from '../../../../api';
 import { webSocketService } from '../../../../services/webSocketService';
 
 /**
  * Custom hook for customer messaging
- * Unified with Staff view using tableId as primary identifier
+ * Tối ưu hóa việc lấy dữ liệu và đồng nhất với logic WebSocket mới
  */
-export const useMessages = (tableId, invoiceId, refreshInterval = 0) => {
+export const useMessages = (tableId, invoiceId) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sending, setSending] = useState(false);
+  const tableIdRef = useRef(tableId);
 
   /**
-   * Fetch messages based on tableId
+   * Lấy lịch sử tin nhắn của bàn
    */
   const fetchMessages = useCallback(async () => {
-    if (!tableId) return;
-
+    if (!invoiceId) {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
     try {
-      const response = await messageApi.getByTableOrdered(tableId);
-
+      const response = await messageApi.getByInvoice(invoiceId);
+      
       if (response && response.success) {
-        // Sort by date ASC to ensure newest at bottom
-        const sorted = (response.data || []).sort((a, b) =>
-          new Date(a.createdAt) - new Date(b.createdAt)
-        );
-        setMessages(sorted);
-      } else if (Array.isArray(response)) {
-        const sorted = response.sort((a, b) =>
-          new Date(a.createdAt) - new Date(b.createdAt)
-        );
-        setMessages(sorted);
+        setMessages(response.data || []);
       }
     } catch (err) {
-      console.error('Error fetching messages:', err);
+      console.error('Lỗi khi tải tin nhắn:', err);
       setError('Không thể tải tin nhắn');
     } finally {
       setLoading(false);
     }
-  }, [tableId]);
+  }, [invoiceId]);
 
-  //Websocket
   useEffect(() => {
-    if (!tableId) return;
-    const unsubscribe = webSocketService.subscribe('/topic/chat/' + tableId, (message) => {
-      fetchMessages();
-    });
-    return () => {
-      unsubscribe();
-    }
+    tableIdRef.current = tableId;
   }, [tableId]);
 
-  // Initial fetch
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
 
-  // Polling for real-time feel
   useEffect(() => {
-    if (refreshInterval > 0 && tableId) {
-      const interval = setInterval(fetchMessages, refreshInterval);
-      return () => clearInterval(interval);
-    }
-  }, [fetchMessages, refreshInterval, tableId]);
+    if (!tableId) return;
+
+    console.log(`[Socket] Subscribing to chat for table ${tableId}`);
+    
+    const unsubscribe = webSocketService.subscribe(`/topic/chat/${tableId}`, (message) => {
+      console.log(`[Socket] Received message for table ${tableId}:`, message);
+      if (message.tableId == tableIdRef.current) {
+        fetchMessages();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [tableId, fetchMessages]);
 
   /**
-   * Send a new message
+   * Gửi tin nhắn mới
    */
   const sendMessage = async (content, type = 'TEXT') => {
     if (!content.trim() && type === 'TEXT') return { success: false };
@@ -83,16 +77,14 @@ export const useMessages = (tableId, invoiceId, refreshInterval = 0) => {
       };
 
       const response = await messageApi.create(messageData);
-
-      if (response && response.success && response.data) {
+      
+      if (response && response.success) {
+        // Thêm tin nhắn vào danh sách cục bộ để hiển thị ngay
         setMessages(prev => [...prev, response.data]);
         return { success: true };
-      } else if (response && response.id) {
-        setMessages(prev => [...prev, response]);
-        return { success: true };
       }
-
-      return { success: false, error: 'Phản hồi không hợp lệ' };
+      
+      return { success: false, error: 'Gửi tin nhắn thất bại' };
     } catch (err) {
       console.error('Error sending message:', err);
       return { success: false, error: 'Gửi tin nhắn thất bại' };

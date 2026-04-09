@@ -14,15 +14,14 @@ import restaurant.project.order_table.entity.enums.TableStatus;
 @Builder
 public class TableCreateRequest {
 
-    @NotNull(message = "Table number is required")
-    private Integer tableNumber;
+	@NotNull(message = "Table number is required")
+	private Integer tableNumber;
 
-    @NotBlank(message = "Area is required")
-    private String area;
+	@NotBlank(message = "Area is required")
+	private String area;
 
-    @NotNull(message = "Status is required")
-    private TableStatus status;
+	@NotNull(message = "Status is required")
+	private TableStatus status;
 
-    @NotNull(message = "Active status is required")
-    private Boolean isActive;
+	private Boolean isActive;
 }

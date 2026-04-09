@@ -2,6 +2,7 @@ package restaurant.project.order_table.service;
 
 import java.util.List;
 
+import restaurant.project.order_table.dto.response.message.ConversationResponse;
 import restaurant.project.order_table.entity.MessageEntity;
 import restaurant.project.order_table.entity.enums.MessageSender;
 import restaurant.project.order_table.entity.enums.MessageType;
@@ -97,4 +98,12 @@ public interface MessageService {
      * @return created message
      */
     MessageEntity sendMessageToTable(Long tableId, String content, MessageType messageType, MessageSender sender);
+
+    /**
+     * Lấy danh sách cuộc trò chuyện – mỗi bàn kèm tin nhắn cuối cùng
+     * (tương đương GetConversations trong JS)
+     *
+     * @return danh sách ConversationResponse
+     */
+    List<ConversationResponse> getConversations();
 }

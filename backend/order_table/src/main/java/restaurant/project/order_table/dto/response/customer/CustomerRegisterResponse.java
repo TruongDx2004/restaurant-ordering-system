@@ -1,20 +1,20 @@
 package restaurant.project.order_table.dto.response.customer;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
 public class CustomerRegisterResponse {
 
-    private Long id;
+	private Long id;
 
-    private String fullName;
+	private String fullName;
 
-    private String phone;
+	private String phone;
 
-    private String status;
+	private String status;
 
-    private Date createdAt;
+	private LocalDateTime createdAt;
 
-    private String message;
+	private String message;
 }

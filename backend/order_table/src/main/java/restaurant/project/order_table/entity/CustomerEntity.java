@@ -1,13 +1,24 @@
 package restaurant.project.order_table.entity;
 
 import jakarta.persistence.*;
-import java.util.Date;
-import lombok.Data;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "customer")
+@SQLDelete(sql = "UPDATE customer SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CustomerEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,17 +36,21 @@ public class CustomerEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    /** Trạng thái */
+    /** Trạng thái (ACTIVE / INACTIVE) */
     @Column(name = "status", nullable = false)
     private String status;
 
-    /** Ngày tạo */
-    @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    /** Thời điểm tạo */
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    //Constructors
-    public CustomerEntity() {
-        this.createdAt = new Date();
-    }
+    /** Thời điểm cập nhật */
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
+    /** Soft delete */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

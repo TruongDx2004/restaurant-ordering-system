@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useModal } from '../contexts/ModalContext';
 import { useAdminAuth } from '../contexts/admin/AdminAuthContext';
+import { useNotifications } from '../components/shared/Notification';
 import styles from './EmployeeLayout.module.css';
 
 /**
@@ -11,7 +13,9 @@ import styles from './EmployeeLayout.module.css';
 const EmployeeLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { showConfirm } = useModal();
   const { user, logout } = useAdminAuth();
+  const { unreadCount } = useNotifications('USER', user?.id);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -25,10 +29,10 @@ const EmployeeLayout = () => {
   }, []);
 
   const handleLogout = async () => {
-    if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
+    showConfirm('Bạn có chắc muốn đăng xuất?', async () => {
       await logout();
       navigate('/admin/login');
-    }
+    }, null, 'Xác nhận');
   };
 
   // Navigation items cho nhân viên
@@ -41,11 +45,18 @@ const EmployeeLayout = () => {
       description: 'Cập nhật món ăn'
     },
     {
-      path: '/employee/kitchen',
-      icon: 'fa-utensils',
-      label: 'Bếp',
-      shortLabel: 'Bếp',
-      description: 'Theo dõi món đang làm'
+      path: '/employee/tables',
+      icon: 'fa-table',
+      label: 'Quản lý bàn',
+      shortLabel: 'Bàn',
+      description: 'Cập nhật trạng thái bàn'
+    },
+    {
+      path: '/employee/notifications',
+      icon: 'fa-bell',
+      label: 'Thông báo',
+      shortLabel: 'T.Báo',
+      badge: unreadCount
     },
     {
       path: '/employee/inbox',
@@ -53,13 +64,6 @@ const EmployeeLayout = () => {
       label: 'Tin nhắn',
       shortLabel: 'Inbox',
       description: 'Hỗ trợ khách hàng'
-    },
-    {
-      path: '/employee/tables',
-      icon: 'fa-table',
-      label: 'Quản lý bàn',
-      shortLabel: 'Bàn',
-      description: 'Cập nhật trạng thái bàn'
     }
   ];
 
@@ -128,7 +132,14 @@ const EmployeeLayout = () => {
                   className={`${styles.navItem} ${isActive ? styles.active : ''}`}
                   title={sidebarCollapsed ? item.label : ''}
                 >
-                  <i className={`fas ${item.icon}`}></i>
+                  <div className={styles.iconWrapper}>
+                    <i className={`fas ${item.icon}`}></i>
+                    {/* {item.badge > 0 && (
+                      <span className={styles.sidebarBadge}>
+                        {item.badge > 99 ? '99+' : item.badge}
+                      </span>
+                    )} */}
+                  </div>
                   {!sidebarCollapsed && (
                     <div className={styles.navItemContent}>
                       <span className={styles.navLabel}>{item.label}</span>
@@ -171,11 +182,12 @@ const EmployeeLayout = () => {
                 to={item.path}
                 className={`${styles.bottomNavItem} ${isActive ? styles.active : ''}`}
               >
-                <i className={`fas ${item.icon}`}></i>
+                <div className={styles.iconWrapper}>
+                  <i className={`fas ${item.icon}`}></i>
+                </div>
                 <span>{item.shortLabel}</span>
               </Link>
-            );
-          })}
+            );          })}
         </nav>
       )}
     </div>

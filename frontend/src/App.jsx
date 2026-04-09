@@ -5,15 +5,18 @@ import { SearchProvider } from './contexts/SearchContext';
 import { CategoryProvider } from './contexts/CategoryContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { webSocketService } from './services/webSocketService';
+import { ModalProvider } from './contexts/ModalContext';
 import { AuthPage } from './modules/customer/auth';
 import CustomerLayout from './layouts/CustomerLayout';
 import CustomerHome from './modules/customer/home';
 import ProfilePage from './modules/customer/profile';
 import DishDetail from './modules/customer/dish-detail';
 import Invoice from './modules/customer/invoice';
+import PaymentResult from './modules/customer/payment-result';
 import Cart from './modules/customer/cart';
 import Orders from './modules/customer/orders';
 import Messages from './modules/customer/messages';
+import NotificationPage from './components/shared/Notification/NotificationPage';
 
 // Admin imports
 import { AdminAuthProvider } from './contexts/admin/AdminAuthContext';
@@ -23,7 +26,6 @@ import ProductManagement from './modules/admin/product-management';
 import UserManagement from './modules/admin/user-management';
 import TableManagement from './modules/admin/table-management';
 import OrderManagement from './modules/admin/order-management';
-import RestaurantSettings from './modules/admin/settings';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import EmployeeLayout from './layouts/EmployeeLayout';
@@ -40,11 +42,12 @@ function App() {
   }, []);
 
   return (
-    <AdminAuthProvider>
-      <AuthProvider>
-        <SearchProvider>
-          <CategoryProvider>
-            <BrowserRouter>
+    <ModalProvider>
+      <AdminAuthProvider>
+        <AuthProvider>
+          <SearchProvider>
+            <CategoryProvider>
+              <BrowserRouter>
               <Routes>
                 {/* ==================== ADMIN ROUTES ==================== */}
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -105,11 +108,11 @@ function App() {
                 />
 
                 <Route
-                  path="/admin/settings"
+                  path="/admin/notifications"
                   element={
-                    <ProtectedAdminRoute requiredRole="ADMIN">
+                    <ProtectedAdminRoute>
                       <AdminLayout>
-                        <RestaurantSettings />
+                        <NotificationPage role="USER" />
                       </AdminLayout>
                     </ProtectedAdminRoute>
                   }
@@ -132,6 +135,7 @@ function App() {
                   <Route path="tables" element={<TableManagementEmployee />} />
                   <Route path="kitchen" element={<KitchenView />} />
                   <Route path="inbox" element={<EmployeeInbox />} />
+                  <Route path="notifications" element={<NotificationPage role="USER" />} />
                   <Route index element={<Navigate to="orders" replace />} />
                 </Route>
 
@@ -154,9 +158,11 @@ function App() {
                   <Route path="home" element={<CustomerHome />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="orders" element={<Orders />} />
+                  <Route path="notifications" element={<NotificationPage role="CUSTOMER" />} />
                   <Route path="dish/:dishId" element={<DishDetail />} />
                   <Route path="cart" element={<Cart />} />
                   <Route path="invoices" element={<Invoice />} />
+                  <Route path="payment-result" element={<PaymentResult />} />
                   <Route 
                     path="inbox" 
                     element={
@@ -178,7 +184,7 @@ function App() {
         </SearchProvider>
       </AuthProvider>
     </AdminAuthProvider>
-  );
-}
-
+    </ModalProvider>
+    );
+    }
 export default App;

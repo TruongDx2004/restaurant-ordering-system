@@ -1,22 +1,25 @@
 package restaurant.project.order_table.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-import restaurant.project.order_table.entity.enums.MessageType;
 import restaurant.project.order_table.entity.enums.MessageSender;
+import restaurant.project.order_table.entity.enums.MessageType;
 
-
-@Getter
-@Setter
+@Entity
+@Table(name = "messages")
+@SQLDelete(sql = "UPDATE messages SET deleted_at = NOW() WHERE messageid = ?")
+@SQLRestriction("deleted_at IS NULL")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "messages")
 public class MessageEntity {
 
     @Id
@@ -24,23 +27,33 @@ public class MessageEntity {
     @Column(name = "messageid")
     private Long id;
 
-    /* Nội dung text */
+    /** Nội dung text */
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    /* Loại tin nhắn */
+    /** Loại tin nhắn */
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", nullable = false)
     private MessageType messageType;
 
-    /* Người gửi */
+    /** Người gửi */
     @Enumerated(EnumType.STRING)
     @Column(name = "sender", nullable = false)
     private MessageSender sender;
 
-    /* Thời gian tạo */
-    @Column(name = "created_at", nullable = false)
+    /** Thời điểm tạo */
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    /** Thời điểm cập nhật */
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    /** Soft delete */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     /* ====== RELATION ====== */
 
@@ -51,10 +64,4 @@ public class MessageEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tableid")
     private TableEntity table;
-
-    //OnCreate
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

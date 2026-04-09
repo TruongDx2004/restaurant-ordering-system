@@ -4,13 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import restaurant.project.order_table.dto.request.auth.LoginRequest;
+import restaurant.project.order_table.dto.request.auth.RefreshTokenRequest;
 import restaurant.project.order_table.dto.response.ApiResponse;
 import restaurant.project.order_table.dto.response.auth.LoginResponse;
 import restaurant.project.order_table.service.AuthService;
 
 /**
- * REST controller for authentication operations
- * Endpoints for admin and employee login
+ * POST /api/auth/login          – đăng nhập admin/nhân viên
+ * POST /api/auth/refresh-token  – lấy access token mới từ refresh token
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -20,39 +21,20 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * Admin/Employee login
-     *
-     * @param loginRequest login credentials
-     * @return login response with JWT token and user info
-     */
+    /** Đăng nhập – trả về accessToken, refreshToken và thông tin user */
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        LoginResponse response = authService.login(loginRequest);
-        return ApiResponse.success(response, "Login successful");
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ApiResponse.success(authService.login(request), "Login successful");
     }
 
     /**
-     * Refresh access token
-     *
-     * @param refreshToken refresh token from header
-     * @return new login response with new tokens
+     * Làm mới access token.
+     * Body: { "refreshToken": "..." }
      */
-    @PostMapping("/refresh")
-    public ApiResponse<LoginResponse> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
-        LoginResponse response = authService.refreshToken(refreshToken);
-        return ApiResponse.success(response, "Token refreshed successfully");
-    }
-
-    /**
-     * Logout user
-     *
-     * @param userId user ID from path
-     * @return success response
-     */
-    @PostMapping("/logout/{userId}")
-    public ApiResponse<Void> logout(@PathVariable Long userId) {
-        authService.logout(userId);
-        return ApiResponse.success(null, "Logout successful");
+    @PostMapping("/refresh-token")
+    public ApiResponse<LoginResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return ApiResponse.success(
+                authService.refreshToken(request.getRefreshToken()),
+                "Access token mới đã được tạo");
     }
 }

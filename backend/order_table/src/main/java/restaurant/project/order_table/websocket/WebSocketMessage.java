@@ -19,7 +19,7 @@ public class WebSocketMessage {
     private String content;        // Message content
     private Object data;           // Additional data (order, table info, etc.)
     private Long tableId;          // Table ID if relevant
-    private Long orderId;          // Order/Invoice ID if relevant
+    private Long invoiceId;         // Invoice ID if relevant
     private LocalDateTime timestamp;
 
     public WebSocketMessage(String type, MessageSender sender, String content) {
