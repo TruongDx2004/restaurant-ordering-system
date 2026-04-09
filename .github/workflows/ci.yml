@@ -3,29 +3,30 @@ name: Backend CI
 on:
   push:
     branches: [develop, main]
-  pull_request:
-    branches: [develop, main]
 
 jobs:
-  build-backend:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Debug Repository Structure
+      - name: Debug Repository
         run: |
+          echo "PWD:"
           pwd
+          echo "FILES:"
           ls -la
-          ls -R
+          echo "POM FILES:"
+          find . -name "pom.xml"
 
-      - name: Setup JDK 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
       - name: Build Backend
-        run: mvn clean verify
-        working-directory: backend/order_table
+        run: |
+          cd backend/order_table
+          mvn clean verify
