@@ -1,4 +1,4 @@
-name: Backend Java CI
+name: Backend CI
 
 on:
   push:
@@ -10,27 +10,22 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend/order_table
-
     steps:
-      - name: Checkout source code
+      - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup JDK 17
+      - name: Debug Structure
+        run: |
+          pwd
+          ls -la
+          ls -R
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('backend/order_table/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2
-
-      - name: Build and Test Backend
+      - name: Build Backend
         run: mvn clean verify
+        working-directory: backend/order_table
