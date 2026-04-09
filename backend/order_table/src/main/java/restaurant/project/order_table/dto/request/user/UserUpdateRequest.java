@@ -24,6 +24,9 @@ public class UserUpdateRequest {
     @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;
 
+    @Size(max = 255, message = "Password must not exceed 255 characters")
+    private String password;
+
     @Size(max = 255, message = "Phone must not exceed 255 characters")
     private String phone;
 

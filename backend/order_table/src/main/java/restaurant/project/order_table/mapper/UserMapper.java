@@ -23,6 +23,7 @@ public class UserMapper {
         return UserEntity.builder()
                 .email(request.getEmail())
                 .name(request.getName())
+                .password(request.getPassword())
                 .phone(request.getPhone())
                 .role(request.getRole())
                 .build();
