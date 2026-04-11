@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class CustomerLoginRequest {
 
-    @NotBlank(message = "Phone is required")
+    @NotBlank(message = "Phone không được để trống")
     private String phone;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Password không được để trống")
     private String password;
 }

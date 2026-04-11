@@ -15,12 +15,12 @@ import restaurant.project.order_table.entity.enums.PaymentMethod;
 @Builder
 public class PaymentProcessRequest {
 
-    @NotNull(message = "Invoice ID is required")
+    @NotNull(message = "Invoice ID không được để trống")
     private Long invoiceId;
 
-    @NotNull(message = "Payment method is required")
+    @NotNull(message = "Payment method không được để trống")
     private PaymentMethod method;
 
-    @NotNull(message = "Amount is required")
+    @NotNull(message = "Amount không được để trống")
     private BigDecimal amount;
 }

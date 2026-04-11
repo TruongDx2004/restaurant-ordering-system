@@ -18,10 +18,6 @@ public class RestaurantConfigController {
     private final RestaurantConfigService configService;
     private final RestaurantConfigMapper configMapper;
 
-    /**
-     * Get restaurant configuration.
-     * @return ApiResponse containing RestaurantConfigResponse
-     */
     @GetMapping
     public ApiResponse<RestaurantConfigResponse> getConfig() {
         RestaurantConfigEntity config = configService.getConfig();
@@ -31,11 +27,6 @@ public class RestaurantConfigController {
         return ApiResponse.success(configMapper.toResponse(config), "Restaurant configuration retrieved successfully");
     }
 
-    /**
-     * Update restaurant configuration.
-     * @param request the configuration update request
-     * @return ApiResponse containing the updated RestaurantConfigResponse
-     */
     @PutMapping
     public ApiResponse<RestaurantConfigResponse> updateConfig(@RequestBody RestaurantConfigUpdateRequest request) {
         RestaurantConfigEntity entity = configMapper.toEntity(request);

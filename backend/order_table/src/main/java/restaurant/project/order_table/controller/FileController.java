@@ -18,15 +18,12 @@ public class FileController {
 
     @PostMapping("/upload")
     public ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        System.out.println("Received file upload: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
         try {
             String filename = fileService.saveFile(file);
             String fileUrl = "/uploads/" + filename;
-            System.out.println("File saved successfully as: " + filename);
-            return ApiResponse.success(fileUrl, "File uploaded successfully");
+            return ApiResponse.success(fileUrl, "Tải lên file thành công");
         } catch (IOException e) {
-            System.err.println("File upload failed: " + e.getMessage());
-            return ApiResponse.error("Failed to upload file: " + e.getMessage());
+            return ApiResponse.error("Lỗi khi tải lên file: " + e.getMessage());
         }
     }
 }

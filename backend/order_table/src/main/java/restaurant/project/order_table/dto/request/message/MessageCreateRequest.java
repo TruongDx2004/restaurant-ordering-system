@@ -15,13 +15,13 @@ import restaurant.project.order_table.entity.enums.MessageType;
 @Builder
 public class MessageCreateRequest {
 
-    @NotBlank(message = "Content is required")
+    @NotBlank(message = "Content không được để trống")
     private String content;
 
-    @NotNull(message = "Message type is required")
+    @NotNull(message = "Message type không được để trống")
     private MessageType messageType;
 
-    @NotNull(message = "Sender is required")
+    @NotNull(message = "Sender không được để trống")
     private MessageSender sender;
 
     private Long invoiceId;

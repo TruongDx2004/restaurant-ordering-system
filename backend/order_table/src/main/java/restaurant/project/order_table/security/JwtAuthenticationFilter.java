@@ -30,10 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Skip JWT filter for WebSocket connections
         String path = request.getRequestURI();
 
-        // ⚡ Bỏ qua Swagger và các đường dẫn công khai/upload
         if (path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/swagger-resources")
@@ -53,17 +51,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // 1. Không có token → cho qua
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Lấy token
         String token = authHeader.substring(7);
 
         try {
-            // 3. Validate token
             String phone = jwtUtil.extractPhone(token);
 
             if (phone != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -72,19 +67,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                                 phone,
                                 null,
-                                null // chưa phân quyền
+                                null
                         );
 
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-                // 4. Set authentication cho Spring Security
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
         } catch (Exception ex) {
-            // Token sai → bỏ qua, Security sẽ chặn
         }
 
         filterChain.doFilter(request, response);

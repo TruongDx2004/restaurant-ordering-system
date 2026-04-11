@@ -11,17 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import restaurant.project.order_table.entity.enums.InvoiceItemStatus;
 
-/**
- * Request DTO for creating invoice with items
- * Used when customer places an order from cart
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class InvoiceWithItemsRequest {
 
-    @NotNull(message = "Table ID is required")
+    @NotNull(message = "Table ID không được để trống")
     private Long tableId;
 
     @NotEmpty(message = "Items are required")
@@ -34,14 +31,14 @@ public class InvoiceWithItemsRequest {
     @Builder
     public static class ItemRequest {
         
-        @NotNull(message = "Dish ID is required")
+        @NotNull(message = "Dish ID không được để trống")
         private Long dishId;
         
-        @NotNull(message = "Quantity is required")
+        @NotNull(message = "Quantity không được để trống")
         private Integer quantity;
 
         @Builder.Default
-        @NotNull(message = "Status is required")
+        @NotNull(message = "Status không được để trống")
         private InvoiceItemStatus status = InvoiceItemStatus.WAITING; // WAITING, PREPARING, SERVED, CANCELLED
         
         private String notes;

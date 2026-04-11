@@ -34,91 +34,64 @@ public class InvoiceItemController {
     private final InvoiceItemService invoiceItemService;
     private final InvoiceItemMapper invoiceItemMapper;
 
-    /**
-     * Create a new invoice item
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<InvoiceItemResponse> createInvoiceItem(@Valid @RequestBody InvoiceItemCreateRequest request) {
         InvoiceItemEntity entity = invoiceItemMapper.toEntity(request);
         InvoiceItemEntity created = invoiceItemService.createInvoiceItem(entity);
-        return ApiResponse.success(invoiceItemMapper.toResponse(created), "Invoice item created successfully");
+        return ApiResponse.success(invoiceItemMapper.toResponse(created), "Mặt hàng hóa đơn đã được tạo thành công");
     }
 
-    /**
-     * Get invoice item by ID
-     */
     @GetMapping("/{id}")
     public ApiResponse<InvoiceItemResponse> getInvoiceItemById(@PathVariable Long id) {
         InvoiceItemEntity invoiceItem = invoiceItemService.getInvoiceItemById(id);
-        return ApiResponse.success(invoiceItemMapper.toResponse(invoiceItem), "Invoice item retrieved successfully");
+        return ApiResponse.success(invoiceItemMapper.toResponse(invoiceItem), "Mặt hàng hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Get all invoice items
-     */
     @GetMapping
     public ApiResponse<List<InvoiceItemResponse>> getAllInvoiceItems() {
         List<InvoiceItemResponse> invoiceItems = invoiceItemMapper
                 .toResponseList(invoiceItemService.getAllInvoiceItems());
-        return ApiResponse.success(invoiceItems, "Invoice items retrieved successfully");
+        return ApiResponse.success(invoiceItems, "Mặt hàng hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Update invoice item
-     */
     @PutMapping("/{id}")
     public ApiResponse<InvoiceItemResponse> updateInvoiceItem(
             @PathVariable Long id,
             @Valid @RequestBody InvoiceItemUpdateRequest request) {
         InvoiceItemEntity entity = invoiceItemMapper.toEntity(request);
         InvoiceItemEntity updated = invoiceItemService.updateInvoiceItem(id, entity);
-        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Invoice item updated successfully");
+        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Mặt hàng hóa đơn đã được cập nhật thành công");
     }
 
-    /**
-     * Delete invoice item
-     */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteInvoiceItem(@PathVariable Long id) {
         invoiceItemService.deleteInvoiceItem(id);
-        return ApiResponse.success(null, "Invoice item deleted successfully");
+        return ApiResponse.success(null, "Mặt hàng hóa đơn đã được xóa thành công");
     }
 
-    /**
-     * Get invoice items by invoice
-     */
     @GetMapping("/invoice/{invoiceId}")
     public ApiResponse<List<InvoiceItemResponse>> getInvoiceItemsByInvoice(@PathVariable Long invoiceId) {
         List<InvoiceItemResponse> invoiceItems = invoiceItemMapper
                 .toResponseList(invoiceItemService.getInvoiceItemsByInvoice(invoiceId));
-        return ApiResponse.success(invoiceItems, "Invoice items retrieved successfully");
+        return ApiResponse.success(invoiceItems, "Mặt hàng hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Get invoice items by dish
-     */
     @GetMapping("/dish/{dishId}")
     public ApiResponse<List<InvoiceItemResponse>> getInvoiceItemsByDish(@PathVariable Long dishId) {
         List<InvoiceItemResponse> invoiceItems = invoiceItemMapper
                 .toResponseList(invoiceItemService.getInvoiceItemsByDish(dishId));
-        return ApiResponse.success(invoiceItems, "Invoice items retrieved successfully");
+        return ApiResponse.success(invoiceItems, "Mặt hàng hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Update invoice item quantity
-     */
     @PatchMapping("/{id}/quantity")
     public ApiResponse<InvoiceItemResponse> updateQuantity(
             @PathVariable Long id,
             @RequestParam Integer quantity) {
         InvoiceItemEntity updated = invoiceItemService.updateQuantity(id, quantity);
-        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Invoice item quantity updated successfully");
+        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Mặt hàng hóa đơn đã được cập nhật số lượng thành công");
     }
 
-    /**
-     * Add item to invoice
-     */
     @PostMapping("/add-to-invoice")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<InvoiceItemResponse> addItemToInvoice(
@@ -126,19 +99,14 @@ public class InvoiceItemController {
             @RequestParam Long dishId,
             @RequestParam Integer quantity) {
         InvoiceItemEntity created = invoiceItemService.addItemToInvoice(invoiceId, dishId, quantity);
-        return ApiResponse.success(invoiceItemMapper.toResponse(created), "Item added to invoice successfully");
+        return ApiResponse.success(invoiceItemMapper.toResponse(created), "Mặt hàng đã được thêm vào hóa đơn thành công");
     }
 
-    /**
-     * Update status of invoice item
-     * Example:
-     * PUT /api/invoice-items/2/status?status=PREPARING
-     */
     @PatchMapping("/{id}/status")
     public ApiResponse<InvoiceItemResponse> updateStatus(
             @PathVariable Long id,
             @RequestParam InvoiceItemStatus status) {
         InvoiceItemEntity updated = invoiceItemService.updateStatus(id, status);
-        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Invoice item status updated successfully");
+        return ApiResponse.success(invoiceItemMapper.toResponse(updated), "Trạng thái mặt hàng hóa đơn đã được cập nhật thành công");
     }
 }

@@ -29,7 +29,6 @@ public class NotificationController {
 	private final NotificationService notificationService;
 	private final NotificationMapper notificationMapper;
 
-	/** Lấy tất cả thông báo */
 	@GetMapping
 	public ApiResponse<List<NotificationResponse>> getAllNotifications() {
 		return ApiResponse.success(
@@ -37,10 +36,6 @@ public class NotificationController {
 				"Lấy danh sách thông báo thành công");
 	}
 
-	/**
-	 * Lấy thông báo theo recipient, sắp xếp mới nhất trước.
-	 * Query: recipientType (mặc định ALL), recipientId (tuỳ chọn)
-	 */
 	@GetMapping("/recipient/ordered")
 	public ApiResponse<List<NotificationResponse>> getByRecipientOrdered(
 			@RequestParam(defaultValue = "USER") RecipientType recipientType,
@@ -49,10 +44,6 @@ public class NotificationController {
 		return ApiResponse.success(notificationMapper.toResponseList(list), "Lấy thông báo thành công");
 	}
 
-	/**
-	 * Đếm số thông báo chưa đọc.
-	 * Query: recipientType, recipientId (tuỳ chọn)
-	 */
 	@GetMapping("/recipient/unread-count")
 	public ApiResponse<Long> countUnread(
 			@RequestParam(defaultValue = "ALL") RecipientType recipientType,
@@ -62,7 +53,6 @@ public class NotificationController {
 				"Đếm thông báo thành công");
 	}
 
-	/** Đánh dấu một thông báo đã đọc */
 	@PatchMapping("/{id}/mark-read")
 	public ApiResponse<NotificationResponse> markAsRead(@PathVariable Long id) {
 		return ApiResponse.success(
@@ -70,10 +60,6 @@ public class NotificationController {
 				"Đánh dấu đã đọc thành công");
 	}
 
-	/**
-	 * Đánh dấu tất cả thông báo của recipient đã đọc.
-	 * Body: { "recipientType": "USER", "recipientId": 1 }
-	 */
 	@PatchMapping("/recipient/mark-all-read")
 	public ApiResponse<Void> markAllAsRead(
 			@RequestParam(defaultValue = "ALL") RecipientType recipientType,
@@ -82,7 +68,6 @@ public class NotificationController {
 		return ApiResponse.success(null, "Tất cả thông báo đã được đánh dấu đọc");
 	}
 
-	/** Xóa thông báo */
 	@DeleteMapping("/{id}")
 	public ApiResponse<Void> deleteNotification(@PathVariable Long id) {
 		notificationService.deleteNotification(id);

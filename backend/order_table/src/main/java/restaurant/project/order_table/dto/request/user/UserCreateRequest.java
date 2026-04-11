@@ -16,21 +16,21 @@ import restaurant.project.order_table.entity.enums.Role;
 @Builder
 public class UserCreateRequest {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    @Size(max = 100, message = "Email must not exceed 100 characters")
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    @Size(max = 100, message = "Email không được quá 100 kí tự")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @NotBlank(message = "Password không được để trống")
+    @Size(min = 6, message = "Password phải có ít nhất 6 kí tự")
     private String password;
 
-    @Size(max = 100, message = "Name must not exceed 100 characters")
+    @Size(max = 100, message = "Name không được quá 100 kí tự")
     private String name;
 
-    @Size(max = 255, message = "Phone must not exceed 255 characters")
+    @Size(max = 255, message = "Phone không được quá 255 kí tự")
     private String phone;
 
-    @NotNull(message = "Role is required")
+    @NotNull(message = "Role không được để trống")
     private Role role;
 }

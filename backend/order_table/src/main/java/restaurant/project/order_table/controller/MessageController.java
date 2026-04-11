@@ -14,13 +14,6 @@ import restaurant.project.order_table.entity.MessageEntity;
 import restaurant.project.order_table.mapper.MessageMapper;
 import restaurant.project.order_table.service.MessageService;
 
-/**
- * POST   /api/messages                      – gửi tin nhắn mới
- * GET    /api/messages/conversations         – danh sách cuộc trò chuyện theo bàn (STAFF)
- * GET    /api/messages/invoice/{invoiceId}   – tin nhắn theo hóa đơn (STAFF)
- * GET    /api/messages/table/{tableId}       – tin nhắn theo bàn (STAFF)
- * DELETE /api/messages/{id}                  – xóa tin nhắn (STAFF)
- */
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
@@ -29,7 +22,6 @@ public class MessageController {
     private final MessageService messageService;
     private final MessageMapper messageMapper;
 
-    /** Gửi tin nhắn mới (CUSTOMER hoặc STAFF) */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<MessageResponse> createMessage(@Valid @RequestBody MessageCreateRequest request) {
@@ -39,7 +31,6 @@ public class MessageController {
                 "Tin nhắn được gửi thành công");
     }
 
-    /** Lấy danh sách cuộc trò chuyện – mỗi bàn kèm tin nhắn cuối (STAFF) */
     @GetMapping("/conversations")
     public ApiResponse<List<ConversationResponse>> getConversations() {
         return ApiResponse.success(
@@ -47,7 +38,6 @@ public class MessageController {
                 "Cuộc trò chuyện được lấy thành công");
     }
 
-    /** Tin nhắn theo hóa đơn (STAFF) */
     @GetMapping("/invoice/{invoiceId}")
     public ApiResponse<List<MessageResponse>> getMessagesByInvoice(@PathVariable Long invoiceId) {
         return ApiResponse.success(
@@ -55,7 +45,6 @@ public class MessageController {
                 "Tin nhắn được lấy thành công");
     }
 
-    /** Tin nhắn theo bàn (STAFF) */
     @GetMapping("/table/{tableId}")
     public ApiResponse<List<MessageResponse>> getMessagesByTable(@PathVariable Long tableId) {
         return ApiResponse.success(
@@ -63,7 +52,6 @@ public class MessageController {
                 "Tin nhắn được lấy thành công");
     }
 
-    /** Xóa tin nhắn (STAFF) */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteMessage(@PathVariable Long id) {
         messageService.deleteMessage(id);

@@ -8,17 +8,17 @@ import lombok.Data;
 @Data
 public class CustomerRegisterRequest {
 
-    @NotBlank(message = "Full name is required")
+    @NotBlank(message = "Full name không được để trống")
     private String fullName;
 
-    @NotBlank(message = "Phone number is required")
+    @NotBlank(message = "Phone number không được để trống")
     @Pattern(
         regexp = "^(0[0-9]{9})$",
-        message = "Phone number must be valid (10 digits, starts with 0)"
+        message = "Số điện thoại phải bắt đầu bằng số 0 và có tổng cộng 10 chữ số"
     )
     private String phone;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @NotBlank(message = "Password không được để trống")
+    @Size(min = 6, message = "Password phải có ít nhất 6 kí tự")
     private String password;
 }

@@ -16,24 +16,6 @@ import restaurant.project.order_table.util.MomoUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Online-payment endpoints — MoMo Pay Gate & VNPay QR.
- *
- * <p>
- * Merge hướng dẫn: paste toàn bộ method vào {@code PaymentController.java}
- * gốc, thêm dependency {@code PaymentOnlineServiceExtension} vào constructor.
- * </p>
- *
- * <pre>
- * POST  /api/payments/momo/create       → initiate MoMo payment, trả payUrl
- * POST  /api/payments/momo/ipn          → MoMo IPN server callback  (Trường whitelist IP)
- * GET   /api/payments/momo/callback     → MoMo redirect after user pays
- *
- * POST  /api/payments/vnpay/create      → initiate VNPay payment, trả redirectUrl
- * GET   /api/payments/vnpay/ipn         → VNPay IPN server callback (Trường whitelist IP)
- * GET   /api/payments/vnpay/callback    → VNPay redirect after user pays
- * </pre>
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/paymentsonline")
@@ -42,14 +24,6 @@ public class PaymentOnlineController {
 
 	private final PaymentOnlineServiceExtension onlinePaymentService;
 
-	// ======================================================================
-	// MoMo
-	// ======================================================================
-
-	/**
-	 * [FRONTEND → BACKEND] Initiate a MoMo Pay Gate payment.
-	 * Returns a {@code paymentUrl} — frontend opens this URL / QR for the customer.
-	 */
 	@PostMapping("/momo/create")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResponse<OnlinePaymentInitResponse> createMomoPayment(
@@ -57,19 +31,9 @@ public class PaymentOnlineController {
 
 		OnlinePaymentInitResponse response = onlinePaymentService.initiateMomoPayment(request);
 
-		return ApiResponse.success(response, "MoMo payment initiated successfully");
+		return ApiResponse.success(response, "Tạo thanh toán MoMo thành công, khách hàng sẽ được chuyển hướng đến trang thanh toán của MoMo");
 	}
 
-	/**
-	 * [MOMO → BACKEND] IPN (Instant Payment Notification) — server-to-server.
-	 * MoMo calls this URL to deliver the final payment result.
-	 * Trường (security) should add IP-whitelist filter for MoMo server IPs.
-	 *
-	 * <p>
-	 * MoMo expects HTTP 200 regardless of business-logic outcome; errors are
-	 * communicated via the JSON body.
-	 * </p>
-	 */
 	@PostMapping("/momo/ipn")
 	public ResponseEntity<Map<String, Object>> handleMomoIpn(
 			@RequestBody MomoUtil.MomoCallbackParams params) {
@@ -78,7 +42,7 @@ public class PaymentOnlineController {
 		try {
 			onlinePaymentService.handleMomoIpn(params);
 			body.put("resultCode", 0);
-			body.put("message", "IPN received successfully");
+			body.put("message", "IPN processed successfully");
 		} catch (Exception e) {
 			log.error("[MoMo IPN] Processing error: {}", e.getMessage(), e);
 			body.put("resultCode", 1);
@@ -88,22 +52,12 @@ public class PaymentOnlineController {
 		return ResponseEntity.ok(body);
 	}
 
-	/**
-	 * [BROWSER → BACKEND] Redirect callback after customer completes / cancels
-	 * on MoMo. MoMo appends the same params as IPN to the redirectUrl.
-	 *
-	 * <p>
-	 * This endpoint is NOT for payment confirmation (use IPN for that).
-	 * Its only job is to redirect the customer to the appropriate frontend page.
-	 * </p>
-	 */
 	@GetMapping("/momo/callback")
 	public ResponseEntity<Void> momoRedirectCallback(
 			@RequestParam(required = false, defaultValue = "") String orderId,
 			@RequestParam(required = false, defaultValue = "-1") int resultCode,
 			HttpServletRequest request) {
 
-		// resultCode 0 = success
 		String frontendUrl = resultCode == 0
 				? "/payment/success?gateway=momo&orderId=" + orderId
 				: "/payment/failed?gateway=momo&orderId=" + orderId;

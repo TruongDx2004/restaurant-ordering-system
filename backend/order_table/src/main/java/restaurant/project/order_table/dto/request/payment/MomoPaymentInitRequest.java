@@ -15,10 +15,10 @@ import java.math.BigDecimal;
 @Builder
 public class MomoPaymentInitRequest {
 
-    @NotNull(message = "Invoice ID is required")
+    @NotNull(message = "Invoice ID không được để trống")
     private Long invoiceId;
 
-    @NotNull(message = "Amount is required")
+    @NotNull(message = "Amount không được để trống")
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;
 

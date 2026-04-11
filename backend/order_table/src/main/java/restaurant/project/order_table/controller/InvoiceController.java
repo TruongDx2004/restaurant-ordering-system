@@ -38,134 +38,94 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceMapper invoiceMapper;
 
-    /**
-     * Create a new invoice
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<InvoiceResponse> createInvoice(@Valid @RequestBody InvoiceCreateRequest request) {
         InvoiceEntity entity = invoiceMapper.toEntity(request);
         InvoiceEntity created = invoiceService.createInvoice(entity);
-        return ApiResponse.success(invoiceMapper.toResponse(created), "Invoice created successfully");
+        return ApiResponse.success(invoiceMapper.toResponse(created), "Hóa đơn đã được tạo thành công");
     }
 
-    /**
-     * Get invoice by ID
-     */
     @GetMapping("/{id}")
     public ApiResponse<InvoiceResponse> getInvoiceById(@PathVariable Long id) {
         InvoiceEntity invoice = invoiceService.getInvoiceById(id);
-        return ApiResponse.success(invoiceMapper.toResponse(invoice), "Invoice retrieved successfully");
+        return ApiResponse.success(invoiceMapper.toResponse(invoice), "Hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Get all invoices
-     */
     @GetMapping
     public ApiResponse<List<InvoiceResponse>> getAllInvoices() {
         List<InvoiceResponse> invoices = invoiceMapper.toResponseList(invoiceService.getAllInvoices());
-        return ApiResponse.success(invoices, "Invoices retrieved successfully");
+        return ApiResponse.success(invoices, "Hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Update invoice
-     */
     @PutMapping("/{id}")
     public ApiResponse<InvoiceResponse> updateInvoice(
             @PathVariable Long id,
             @Valid @RequestBody InvoiceUpdateRequest request) {
         InvoiceEntity entity = invoiceMapper.toEntity(request);
         InvoiceEntity updated = invoiceService.updateInvoice(id, entity);
-        return ApiResponse.success(invoiceMapper.toResponse(updated), "Invoice updated successfully");
+        return ApiResponse.success(invoiceMapper.toResponse(updated), "Hóa đơn đã được cập nhật thành công");
     }
 
-    /**
-     * Delete invoice
-     */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteInvoice(@PathVariable Long id) {
         invoiceService.deleteInvoice(id);
-        return ApiResponse.success(null, "Invoice deleted successfully");
+        return ApiResponse.success(null, "Hóa đơn đã được xóa thành công");
     }
 
-    /**
-     * Get invoices by status
-     */
     @GetMapping("/status/{status}")
     public ApiResponse<List<InvoiceResponse>> getInvoicesByStatus(@PathVariable InvoiceStatus status) {
         List<InvoiceResponse> invoices = invoiceMapper.toResponseList(invoiceService.getInvoicesByStatus(status));
-        return ApiResponse.success(invoices, "Invoices retrieved successfully");
+        return ApiResponse.success(invoices, "Hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Get invoices by table
-     */
     @GetMapping("/table/{tableId}")
     public ApiResponse<List<InvoiceResponse>> getInvoicesByTable(@PathVariable Long tableId) {
         List<InvoiceResponse> invoices = invoiceMapper.toResponseList(invoiceService.getInvoicesByTable(tableId));
-        return ApiResponse.success(invoices, "Invoices retrieved successfully");
+        return ApiResponse.success(invoices, "Hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Get invoices by date range
-     */
     @GetMapping("/date-range")
     public ApiResponse<List<InvoiceResponse>> getInvoicesByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         List<InvoiceResponse> invoices = invoiceMapper.toResponseList(invoiceService.getInvoicesByDateRange(startDate, endDate));
-        return ApiResponse.success(invoices, "Invoices retrieved successfully");
+        return ApiResponse.success(invoices, "Hóa đơn đã được lấy thành công");
     }
 
-    /**
-     * Update invoice status
-     */
     @PatchMapping("/{id}/status")
     public ApiResponse<InvoiceResponse> updateInvoiceStatus(
             @PathVariable Long id,
             @RequestParam InvoiceStatus status) {
         InvoiceEntity updated = invoiceService.updateInvoiceStatus(id, status);
-        return ApiResponse.success(invoiceMapper.toResponse(updated), "Invoice status updated successfully");
+        return ApiResponse.success(invoiceMapper.toResponse(updated), "Hóa đơn đã được cập nhật trạng thái thành công");
     }
 
-    /**
-     * Get active invoice for a table
-     */
     @GetMapping("/table/{tableId}/active")
     public ApiResponse<InvoiceResponse> getActiveInvoiceByTable(@PathVariable Long tableId) {
         InvoiceEntity invoice = invoiceService.getActiveInvoiceByTable(tableId);
-        return ApiResponse.success(invoice != null ? invoiceMapper.toResponse(invoice) : null, "Active invoice retrieved successfully");
+        return ApiResponse.success(invoice != null ? invoiceMapper.toResponse(invoice) : null, "Hóa đơn hoạt động đã được lấy thành công");
     }
 
-    /**
-     * Get active invoice for a table by table number
-     */
     @GetMapping("/table-number/{tableNumber}/active")
     public ApiResponse<InvoiceResponse> getActiveInvoiceByTableNumber(@PathVariable Integer tableNumber) {
         InvoiceEntity invoice = invoiceService.getActiveInvoiceByTableNumber(tableNumber);
-        return ApiResponse.success(invoice != null ? invoiceMapper.toResponse(invoice) : null, "Active invoice retrieved successfully");
+        return ApiResponse.success(invoice != null ? invoiceMapper.toResponse(invoice) : null, "Hóa đơn hoạt động đã được lấy thành công");
     }
 
-    /**
-     * Calculate invoice total
-     */
     @GetMapping("/{id}/calculate-total")
     public ApiResponse<BigDecimal> calculateInvoiceTotal(@PathVariable Long id) {
         BigDecimal total = invoiceService.calculateInvoiceTotal(id);
-        return ApiResponse.success(total, "Invoice total calculated successfully");
+        return ApiResponse.success(total, "Tổng giá trị hóa đơn đã được tính toán thành công");
     }
 
-    /**
-     * Create invoice with items (for customer order from cart)
-     */
     @PostMapping("/create-with-items")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<InvoiceResponse> createInvoiceWithItems(@Valid @RequestBody InvoiceWithItemsRequest request) {
-        // Convert request items to ItemData
         List<InvoiceService.ItemData> items = request.getItems().stream()
                 .map(item -> new InvoiceService.ItemData(item.getDishId(), item.getQuantity(), item.getStatus(),item.getNotes()))
                 .toList();
         InvoiceEntity created = invoiceService.createInvoiceWithItems(request.getTableId(), items);
-        return ApiResponse.success(invoiceMapper.toResponse(created), "Invoice with items created successfully");
+        return ApiResponse.success(invoiceMapper.toResponse(created), "Hóa đơn đã được tạo thành công");
     }
 }

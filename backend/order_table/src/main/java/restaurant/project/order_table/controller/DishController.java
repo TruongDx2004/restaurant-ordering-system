@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import restaurant.project.order_table.dto.request.dish.DishCreateRequest;
 import restaurant.project.order_table.dto.request.dish.DishUpdateRequest;
@@ -36,9 +34,6 @@ public class DishController {
     private final DishService dishService;
     private final DishMapper dishMapper;
 
-    /**
-     * Create a new dish
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<DishResponse> createDish(
@@ -48,32 +43,23 @@ public class DishController {
 
         return ApiResponse.success(
                 dishMapper.toResponse(created),
-                "Dish created successfully");
+                "Món ăn đã được tạo thành công");
     }
 
-    /**
-     * Get dish by ID
-     */
     @GetMapping("/{id}")
     public ApiResponse<DishResponse> getDishById(@PathVariable Long id) {
         DishEntity dish = dishService.getDishById(id);
-        return ApiResponse.success(dishMapper.toResponse(dish), "Dish retrieved successfully");
-    }
+        return ApiResponse.success(dishMapper.toResponse(dish), "Món ăn đã được lấy thành công");
+    } 
 
-    /**
-     * Get all dishes
-     */
     @GetMapping
     public ApiResponse<List<DishResponse>> getAllDishes() {
         List<DishResponse> dishes = dishService.getAllDishes().stream()
                 .map(dishMapper::toResponse)
                 .collect(Collectors.toList());
-        return ApiResponse.success(dishes, "Dishes retrieved successfully");
+        return ApiResponse.success(dishes, "Món ăn đã được lấy thành công");
     }
 
-    /**
-     * Update dish
-     */
     @PutMapping("/{id}")
     public ApiResponse<DishResponse> updateDish(@PathVariable Long id,@ModelAttribute DishUpdateRequest request) {
 
@@ -81,59 +67,44 @@ public class DishController {
 
         return ApiResponse.success(
                 dishMapper.toResponse(updated),
-                "Dish updated successfully");
+                "Món ăn đã được cập nhật thành công");
     }
 
-    /**
-     * Delete dish
-     */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteDish(@PathVariable Long id) {
         dishService.deleteDish(id);
-        return ApiResponse.success(null, "Dish deleted successfully");
+        return ApiResponse.success(null, "Món ăn đã được xóa thành công");
     }
 
-    /**
-     * Get dishes by status
-     */
     @GetMapping("/status/{status}")
     public ApiResponse<List<DishResponse>> getDishesByStatus(@PathVariable DishStatus status) {
         List<DishResponse> dishes = dishService.getDishesByStatus(status).stream()
                 .map(dishMapper::toResponse)
                 .collect(Collectors.toList());
-        return ApiResponse.success(dishes, "Dishes retrieved successfully");
+        return ApiResponse.success(dishes, "Món ăn đã được lấy theo trạng thái thành công");
     }
 
-    /**
-     * Get dishes by category
-     */
     @GetMapping("/category/{categoryId}")
     public ApiResponse<List<DishResponse>> getDishesByCategory(@PathVariable Long categoryId) {
         List<DishResponse> dishes = dishService.getDishesByCategory(categoryId).stream()
                 .map(dishMapper::toResponse)
                 .collect(Collectors.toList());
-        return ApiResponse.success(dishes, "Dishes retrieved successfully");
+        return ApiResponse.success(dishes, "Món ăn đã được lấy theo danh mục thành công");
     }
 
-    /**
-     * Search dishes by name
-     */
     @GetMapping("/search")
     public ApiResponse<List<DishResponse>> searchDishesByName(@RequestParam String name) {
         List<DishResponse> dishes = dishService.searchDishesByName(name).stream()
                 .map(dishMapper::toResponse)
                 .collect(Collectors.toList());
-        return ApiResponse.success(dishes, "Dishes retrieved successfully");
+        return ApiResponse.success(dishes, "Món ăn đã được tìm kiếm thành công");
     }
 
-    /**
-     * Update dish status
-     */
     @PatchMapping("/{id}/status")
     public ApiResponse<DishResponse> updateDishStatus(
             @PathVariable Long id,
             @RequestParam DishStatus status) {
         DishEntity updated = dishService.updateDishStatus(id, status);
-        return ApiResponse.success(dishMapper.toResponse(updated), "Dish status updated successfully");
+        return ApiResponse.success(dishMapper.toResponse(updated), "Trạng thái món ăn đã được cập nhật thành công");
     }
 }

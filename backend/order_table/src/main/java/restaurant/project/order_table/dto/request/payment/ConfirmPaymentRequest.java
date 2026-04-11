@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConfirmPaymentRequest {
 
-    @NotNull(message = "Invoice ID is required")
+    @NotNull(message = "Invoice ID không được để trống")
     private Long invoiceId;
 
     /** Mã giao dịch (tuỳ chọn, tự sinh nếu null) */

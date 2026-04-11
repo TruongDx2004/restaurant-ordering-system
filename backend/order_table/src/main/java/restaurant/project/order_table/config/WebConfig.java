@@ -13,7 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        // 🔥 LẤY PATH TUYỆT ĐỐI CHUẨN WINDOWS
         String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
         Path uploadPath = Paths.get(uploadDir);

@@ -15,20 +15,20 @@ import restaurant.project.order_table.entity.enums.RecipientType;
 @Builder
 public class NotificationCreateRequest {
 
-    @NotNull(message = "Recipient type is required")
+    @NotNull(message = "Recipient type không được để trống")
     private RecipientType recipientType;
 
-    @NotNull(message = "Recipient ID is required")
+    @NotNull(message = "Recipient ID không được để trống")
     private Long recipientId;
 
-    @NotBlank(message = "Title is required")
+    @NotBlank(message = "Title không được để trống")
     private String title;
 
-    @NotBlank(message = "Message is required")
+    @NotBlank(message = "Message không được để trống")
     @Size(max = 1000, message = "Message must not exceed 1000 characters")
     private String message;
 
-    @NotBlank(message = "Type is required")
+    @NotBlank(message = "Type không được để trống")
     private String type;
 
     private String data;

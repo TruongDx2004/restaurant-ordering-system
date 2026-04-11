@@ -26,9 +26,6 @@ public class CustomerAuthController {
     private final CustomerService customerService;
     private final CustomerMapper customerMapper;
 
-    /**
-     * Customer registration
-     */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CustomerRegisterResponse> register(@Valid @RequestBody CustomerRegisterRequest request) {
@@ -38,16 +35,13 @@ public class CustomerAuthController {
                 request.getPassword()
         );
         CustomerRegisterResponse response = customerMapper.toRegisterResponse(customer);
-        return ApiResponse.success(response, "Customer registered successfully");
+        return ApiResponse.success(response, "Khách hàng đã được đăng ký thành công");
     }
 
-    /**
-     * Customer login
-     */
     @PostMapping("/login")
     public ApiResponse<TokenResponse> login(@Valid @RequestBody CustomerLoginRequest request) {
         String token = customerService.login(request.getPhone(), request.getPassword());
         TokenResponse response = customerMapper.toTokenResponse(token);
-        return ApiResponse.success(response, "Login successful");
+        return ApiResponse.success(response, "Đăng nhập thành công");
     }
 }

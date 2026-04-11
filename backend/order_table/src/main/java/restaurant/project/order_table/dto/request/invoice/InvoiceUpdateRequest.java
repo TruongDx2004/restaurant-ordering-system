@@ -15,12 +15,12 @@ import restaurant.project.order_table.entity.enums.InvoiceStatus;
 @Builder
 public class InvoiceUpdateRequest {
 
-    @NotNull(message = "Table ID is required")
+    @NotNull(message = "Table ID không được để trống")
     private Long tableId;
 
-    @NotNull(message = "Total amount is required")
+    @NotNull(message = "Total amount không được để trống")
     private BigDecimal totalAmount;
 
-    @NotNull(message = "Status is required")
+    @NotNull(message = "Status không được để trống")
     private InvoiceStatus status;
 }

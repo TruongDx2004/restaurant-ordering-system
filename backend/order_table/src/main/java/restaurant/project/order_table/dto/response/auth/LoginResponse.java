@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import restaurant.project.order_table.dto.response.user.UserResponse;
 
-/**
- * DTO for admin/employee login response
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

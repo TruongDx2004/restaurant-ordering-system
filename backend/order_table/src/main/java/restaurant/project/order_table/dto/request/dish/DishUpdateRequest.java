@@ -18,20 +18,20 @@ import restaurant.project.order_table.entity.enums.DishStatus;
 @Builder
 public class DishUpdateRequest {
 
-    @NotBlank(message = "Dish name is required")
-    @Size(max = 255, message = "Dish name must not exceed 255 characters")
+    @NotBlank(message = "Dish name không được để trống")
+    @Size(max = 255, message = "Dish name không được quá 255 kí tự")
     private String name;
 
-    @NotNull(message = "Price is required")
-    @Min(value = 0, message = "Price must be greater than or equal to 0")
+    @NotNull(message = "Price không được để trống")
+    @Min(value = 0, message = "Gía phải lớn hơn hoặc bằng 0")
     private Integer price;
 
-    @NotNull(message = "Status is required")
+    @NotNull(message = "Status không được để trống")
     private DishStatus status;
 
-    @Size(max = 255, message = "Image URL must not exceed 255 characters")
+    @Size(max = 255, message = "Image URL không được quá 255 kí tự")
     private MultipartFile image;
 
-    @NotNull(message = "Category ID is required")
+    @NotNull(message = "Category ID không được để trống")
     private Long categoryId;
 }

@@ -13,13 +13,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CashPaymentRequest {
 
-    @NotNull(message = "Invoice ID is required")
+    @NotNull(message = "Invoice ID không được để trống")
     private Long invoiceId;
 
-    @NotNull(message = "Table ID is required")
+    @NotNull(message = "Table ID không được để trống")
     private Long tableId;
 
-    @NotNull(message = "Amount is required")
-    @Positive(message = "Amount must be positive")
+    @NotNull(message = "Amount không được để trống")
+    @Positive(message = "Amount phai là số dương")
     private BigDecimal amount;
 }

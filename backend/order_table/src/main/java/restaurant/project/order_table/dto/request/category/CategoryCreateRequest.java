@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CategoryCreateRequest {
 
-    @NotBlank(message = "Category name is required")
-    @Size(max = 255, message = "Category name must not exceed 255 characters")
+    @NotBlank(message = "Category name không được để trống")
+    @Size(max = 255, message = "Category name không được quá 255 kí tự")
     private String name;
 }

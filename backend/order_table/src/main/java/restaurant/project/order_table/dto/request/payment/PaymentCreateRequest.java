@@ -16,16 +16,16 @@ import restaurant.project.order_table.entity.enums.PaymentStatus;
 @Builder
 public class PaymentCreateRequest {
 
-    @NotNull(message = "Invoice ID is required")
+    @NotNull(message = "Invoice ID không được để trống")
     private Long invoiceId;
 
-    @NotNull(message = "Amount is required")
+    @NotNull(message = "Amount không được để trống")
     private BigDecimal amount;
 
-    @NotNull(message = "Payment method is required")
+    @NotNull(message = "Payment method không được để trống")
     private PaymentMethod method;
 
-    @NotNull(message = "Payment status is required")
+    @NotNull(message = "Payment status không được để trống")
     private PaymentStatus status;
 
     private String transactionCode;

@@ -32,64 +32,46 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
 
-    /**
-     * Create a new category
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CategoryResponse> createCategory(@Valid @RequestBody CategoryCreateRequest request) {
         CategoryEntity entity = categoryMapper.toEntity(request);
         CategoryEntity created = categoryService.createCategory(entity);
-        return ApiResponse.success(categoryMapper.toResponse(created), "Category created successfully");
+        return ApiResponse.success(categoryMapper.toResponse(created), "Tạo danh mục thành công");
     }
 
-    /**
-     * Get category by ID
-     */
     @GetMapping("/{id}")
     public ApiResponse<CategoryResponse> getCategoryById(@PathVariable Long id) {
         CategoryEntity category = categoryService.getCategoryById(id);
-        return ApiResponse.success(categoryMapper.toResponse(category), "Category retrieved successfully");
+        return ApiResponse.success(categoryMapper.toResponse(category), "Danh mục đã được lấy thành công");
     }
 
-    /**
-     * Get all categories
-     */
     @GetMapping
     public ApiResponse<List<CategoryResponse>> getAllCategories() {
         List<CategoryResponse> categories = categoryService.getAllCategories().stream()
                 .map(categoryMapper::toResponse)
                 .collect(Collectors.toList());
-        return ApiResponse.success(categories, "Categories retrieved successfully");
+        return ApiResponse.success(categories, "Danh mục đã được lấy thành công");
     }
 
-    /**
-     * Update category
-     */
     @PutMapping("/{id}")
     public ApiResponse<CategoryResponse> updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody CategoryUpdateRequest request) {
         CategoryEntity entity = categoryMapper.toEntity(request);
         CategoryEntity updated = categoryService.updateCategory(id, entity);
-        return ApiResponse.success(categoryMapper.toResponse(updated), "Category updated successfully");
+        return ApiResponse.success(categoryMapper.toResponse(updated), "Danh mục đã được cập nhật thành công");
     }
 
-    /**
-     * Delete category
-     */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ApiResponse.success(null, "Category deleted successfully");
+        return ApiResponse.success(null, "Danh mục đã được xóa thành công");
     }
 
-    /**
-     * Get category by name
-     */
     @GetMapping("/name/{name}")
     public ApiResponse<CategoryResponse> getCategoryByName(@PathVariable String name) {
         CategoryEntity category = categoryService.getCategoryByName(name);
-        return ApiResponse.success(categoryMapper.toResponse(category), "Category retrieved successfully");
+        return ApiResponse.success(categoryMapper.toResponse(category), "Danh mục đã được lấy thành công");
     }
 }
