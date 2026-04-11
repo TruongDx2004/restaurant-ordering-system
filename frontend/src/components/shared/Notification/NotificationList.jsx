@@ -33,7 +33,7 @@ const NotificationList = ({ recipientType, recipientId }) => {
             const type = n.type;
 
             let targetCategory = NOTIFICATION_TYPES.SYSTEM;
-            if (type === "CASH_PAYMENT_REQUEST" || type === "PAYMENT_STATUS") {
+            if (type === "CASH_PAYMENT_REQUEST" || type === "PAYMENT_STATUS" || type === "PAYMENT_SUCCESS") {
                 targetCategory = NOTIFICATION_TYPES.PAYMENT;
             } else if (type === "ORDER_STATUS" || type === "NEW_ORDER") {
                 targetCategory = NOTIFICATION_TYPES.ORDER;

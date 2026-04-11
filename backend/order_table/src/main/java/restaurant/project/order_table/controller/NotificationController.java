@@ -45,9 +45,7 @@ public class NotificationController {
 	public ApiResponse<List<NotificationResponse>> getByRecipientOrdered(
 			@RequestParam(defaultValue = "USER") RecipientType recipientType,
 			@RequestParam(required = false) Long recipientId) {
-		List<NotificationEntity> list = recipientId != null
-				? notificationService.getNotificationsByRecipientOrderedByDate(recipientType)
-				: notificationService.getAllNotifications();
+		List<NotificationEntity> list = notificationService.getNotificationsByRecipientOrderedByDate(recipientType, recipientId);
 		return ApiResponse.success(notificationMapper.toResponseList(list), "Lấy thông báo thành công");
 	}
 

@@ -14,8 +14,16 @@ const useNotifications = (recipientType, recipientId) => {
         setLoading(true);
         try {
             const response = await notificationApi.getByRecipient(recipientType, recipientId);
-            const data = response.data || [];
-            setNotifications(data);
+            const rawNotifications = response.data || [];
+            
+            // Parse 'data' field if it's a string
+            const parsedNotifications = rawNotifications.map(n => ({
+                ...n,
+                isRead: n.read, // Normalize 'read' to 'isRead' for consistency
+                data: typeof n.data === 'string' ? JSON.parse(n.data) : n.data
+            }));
+            
+            setNotifications(parsedNotifications);
             
             const countResponse = await notificationApi.getUnreadCount(recipientType, recipientId);
             setUnreadCount(countResponse.data || 0);

@@ -71,7 +71,7 @@ public interface NotificationService {
 	 * @param recipientId   recipient ID
 	 * @return list of notifications ordered by date descending
 	 */
-	List<NotificationEntity> getNotificationsByRecipientOrderedByDate(RecipientType recipientType);
+	List<NotificationEntity> getNotificationsByRecipientOrderedByDate(RecipientType recipientType, Long recipientId);
 
 	/**
 	 * Mark notification as read

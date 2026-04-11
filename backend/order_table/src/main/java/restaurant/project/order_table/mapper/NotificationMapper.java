@@ -17,6 +17,8 @@ public class NotificationMapper {
                 .recipientId(request.getRecipientId())
                 .title(request.getTitle())
                 .message(request.getMessage())
+                .type(request.getType())
+                .data(request.getData())
                 .read(false)
                 .build();
     }
@@ -28,6 +30,8 @@ public class NotificationMapper {
                 .recipientId(entity.getRecipientId())
                 .title(entity.getTitle())
                 .message(entity.getMessage())
+                .type(entity.getType())
+                .data(entity.getData())
                 .read(entity.getRead())
                 .createdAt(entity.getCreatedAt())
                 .build();

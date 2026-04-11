@@ -1,11 +1,12 @@
 package restaurant.project.order_table.service.impl;
 
 import java.util.List;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import restaurant.project.order_table.entity.NotificationEntity;
@@ -21,6 +22,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 	private final NotificationRepository notificationRepository;
 	private final WebSocketService webSocketService;
+	private final ObjectMapper objectMapper;
 
 	@Override
 	public NotificationEntity createNotification(NotificationEntity notification) {
@@ -68,7 +70,10 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	public List<NotificationEntity> getNotificationsByRecipientOrderedByDate(RecipientType recipientType) {
+	public List<NotificationEntity> getNotificationsByRecipientOrderedByDate(RecipientType recipientType, Long recipientId) {
+		if (recipientId != null && recipientId != 0L) {
+			return notificationRepository.findByRecipientTypeAndRecipientIdOrBroadcastOrderByCreatedAtDesc(recipientType, recipientId);
+		}
 		return notificationRepository.findByRecipientTypeOrderByCreatedAtDesc(recipientType);
 	}
 
@@ -118,6 +123,16 @@ public class NotificationServiceImpl implements NotificationService {
 		notification.setType(type);
 		notification.setMessage(message);
 		notification.setRead(false);
+
+		// Serialize data to JSON if not null
+		if (data != null) {
+			try {
+				notification.setData(objectMapper.writeValueAsString(data));
+			} catch (JsonProcessingException e) {
+				// Log error or ignore if data is not critical
+				notification.setData(null);
+			}
+		}
 
 		NotificationEntity saved = notificationRepository.save(notification);
 

@@ -27,4 +27,9 @@ public class NotificationCreateRequest {
     @NotBlank(message = "Message is required")
     @Size(max = 1000, message = "Message must not exceed 1000 characters")
     private String message;
+
+    @NotBlank(message = "Type is required")
+    private String type;
+
+    private String data;
 }
