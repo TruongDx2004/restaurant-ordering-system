@@ -51,6 +51,8 @@ public class SecurityConfig {
 								// Allow getting dishes and categories
 								"/api/dishes/**",
 								"/api/categories/**",
+								// Allow calling waiter and sending messages without authentication
+								"/api/messages",
 								// Swagger UI endpoints
 								"/v3/api-docs/**",
 								"/swagger-ui/**",
