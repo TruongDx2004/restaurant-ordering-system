@@ -26,167 +26,155 @@ import restaurant.project.order_table.websocket.WebSocketService;
 @RequiredArgsConstructor
 public class InvoiceItemServiceImpl implements InvoiceItemService {
 
-    private final InvoiceItemRepository invoiceItemRepository;
-    private final InvoiceService invoiceService;
-    private final DishService dishService;
-    private final WebSocketService webSocketService;
-    private final NotificationService notificationService;
+	private final InvoiceItemRepository invoiceItemRepository;
+	private final InvoiceService invoiceService;
+	private final DishService dishService;
+	private final WebSocketService webSocketService;
+	private final NotificationService notificationService;
 
-    @Override
-    public InvoiceItemEntity createInvoiceItem(InvoiceItemEntity invoiceItem) {
-        if (invoiceItem.getStatus() == null)
-            invoiceItem.setStatus(InvoiceItemStatus.WAITING);
-        return invoiceItemRepository.save(invoiceItem);
-    }
+	@Override
+	public InvoiceItemEntity createInvoiceItem(InvoiceItemEntity invoiceItem) {
+		if (invoiceItem.getStatus() == null)
+			invoiceItem.setStatus(InvoiceItemStatus.WAITING);
+		return invoiceItemRepository.save(invoiceItem);
+	}
 
-    @Override
-    public InvoiceItemEntity getInvoiceItemById(Long id) {
-        return invoiceItemRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Invoice item not found with id: " + id));
-    }
+	@Override
+	public InvoiceItemEntity getInvoiceItemById(Long id) {
+		return invoiceItemRepository.findById(id)
+				.orElseThrow(() -> new BadRequestException("Invoice item not found with id: " + id));
+	}
 
-    @Override
-    public List<InvoiceItemEntity> getAllInvoiceItems() {
-        return invoiceItemRepository.findAll();
-    }
+	@Override
+	public List<InvoiceItemEntity> getAllInvoiceItems() {
+		return invoiceItemRepository.findAll();
+	}
 
-    @Override
-    public InvoiceItemEntity updateInvoiceItem(Long id, InvoiceItemEntity invoiceItem) {
-        InvoiceItemEntity existingItem = getInvoiceItemById(id);
+	@Override
+	public InvoiceItemEntity updateInvoiceItem(Long id, InvoiceItemEntity invoiceItem) {
+		InvoiceItemEntity existingItem = getInvoiceItemById(id);
 
-        existingItem.setDish(invoiceItem.getDish());
-        existingItem.setQuantity(invoiceItem.getQuantity());
-        existingItem.setUnitPrice(invoiceItem.getUnitPrice());
-        if (invoiceItem.getStatus() != null) {
-            existingItem.setStatus(invoiceItem.getStatus());
-        }
-        // Recalculate total price
-        BigDecimal totalPrice = invoiceItem.getUnitPrice()
-                .multiply(BigDecimal.valueOf(invoiceItem.getQuantity()));
-        existingItem.setTotalPrice(totalPrice);
+		existingItem.setDish(invoiceItem.getDish());
+		existingItem.setQuantity(invoiceItem.getQuantity());
+		existingItem.setUnitPrice(invoiceItem.getUnitPrice());
+		if (invoiceItem.getStatus() != null) {
+			existingItem.setStatus(invoiceItem.getStatus());
+		}
+		BigDecimal totalPrice = invoiceItem.getUnitPrice()
+				.multiply(BigDecimal.valueOf(invoiceItem.getQuantity()));
+		existingItem.setTotalPrice(totalPrice);
 
-        return invoiceItemRepository.save(existingItem);
-    }
+		return invoiceItemRepository.save(existingItem);
+	}
 
-    @Override
-    public void deleteInvoiceItem(Long id) {
-        InvoiceItemEntity invoiceItem = getInvoiceItemById(id);
-        invoiceItemRepository.delete(invoiceItem);
-    }
+	@Override
+	public void deleteInvoiceItem(Long id) {
+		InvoiceItemEntity invoiceItem = getInvoiceItemById(id);
+		invoiceItemRepository.delete(invoiceItem);
+	}
 
-    @Override
-    public List<InvoiceItemEntity> getInvoiceItemsByInvoice(Long invoiceId) {
-        return invoiceItemRepository.findByInvoiceId(invoiceId);
-    }
+	@Override
+	public List<InvoiceItemEntity> getInvoiceItemsByInvoice(Long invoiceId) {
+		return invoiceItemRepository.findByInvoiceId(invoiceId);
+	}
 
-    @Override
-    public List<InvoiceItemEntity> getInvoiceItemsByDish(Long dishId) {
-        return invoiceItemRepository.findByDishId(dishId);
-    }
+	@Override
+	public List<InvoiceItemEntity> getInvoiceItemsByDish(Long dishId) {
+		return invoiceItemRepository.findByDishId(dishId);
+	}
 
-    @Override
-    public InvoiceItemEntity updateQuantity(Long id, Integer quantity) {
-        if (quantity <= 0) {
-            throw new BadRequestException("Quantity must be greater than 0");
-        }
+	@Override
+	public InvoiceItemEntity updateQuantity(Long id, Integer quantity) {
+		if (quantity <= 0) {
+			throw new BadRequestException("Quantity must be greater than 0");
+		}
 
-        InvoiceItemEntity invoiceItem = getInvoiceItemById(id);
-        invoiceItem.setQuantity(quantity);
-        // Tính lại totalPrice theo unitPrice hiện tại
-        BigDecimal totalPrice = invoiceItem.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
-        invoiceItem.setTotalPrice(totalPrice);
-        return invoiceItemRepository.save(invoiceItem);
-    }
+		InvoiceItemEntity invoiceItem = getInvoiceItemById(id);
+		invoiceItem.setQuantity(quantity);
+		BigDecimal totalPrice = invoiceItem.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
+		invoiceItem.setTotalPrice(totalPrice);
+		return invoiceItemRepository.save(invoiceItem);
+	}
 
-    @Override
-    public InvoiceItemEntity addItemToInvoice(Long invoiceId, Long dishId, Integer quantity) {
-        if (quantity <= 0) {
-            throw new BadRequestException("Quantity must be greater than 0");
-        }
+	@Override
+	public InvoiceItemEntity addItemToInvoice(Long invoiceId, Long dishId, Integer quantity) {
+		if (quantity <= 0) {
+			throw new BadRequestException("Quantity must be greater than 0");
+		}
 
-        InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
-        DishEntity dish = dishService.getDishById(dishId);
+		InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
+		DishEntity dish = dishService.getDishById(dishId);
 
-        // Get unit price from dish
-        BigDecimal unitPrice = BigDecimal.valueOf(dish.getPrice());
-        BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+		BigDecimal unitPrice = BigDecimal.valueOf(dish.getPrice());
+		BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
-        InvoiceItemEntity invoiceItem = new InvoiceItemEntity();
-        invoiceItem.setInvoice(invoice);
-        invoiceItem.setDish(dish);
-        invoiceItem.setQuantity(quantity);
-        invoiceItem.setUnitPrice(unitPrice);
-        invoiceItem.setTotalPrice(totalPrice);
+		InvoiceItemEntity invoiceItem = new InvoiceItemEntity();
+		invoiceItem.setInvoice(invoice);
+		invoiceItem.setDish(dish);
+		invoiceItem.setQuantity(quantity);
+		invoiceItem.setUnitPrice(unitPrice);
+		invoiceItem.setTotalPrice(totalPrice);
 
-        InvoiceItemEntity saved = invoiceItemRepository.save(invoiceItem);
+		InvoiceItemEntity saved = invoiceItemRepository.save(invoiceItem);
 
-        // Gửi thông báo "Món mới được gọi" cho nhân viên
-        notificationService.createAndSend(
-            RecipientType.USER, 0L,
-            "Món mới được gọi",
-            "Bàn " + invoice.getTable().getId() + " gọi " + quantity + "x " + dish.getName(),
-            "NEW_ORDER",
-            Map.of("invoiceId", invoiceId, "tableId", invoice.getTable().getId())
-        );
+		notificationService.createAndSend(
+				RecipientType.USER, 0L,
+				"Món mới được gọi",
+				"Bàn " + invoice.getTable().getId() + " gọi " + quantity + "x " + dish.getName(),
+				"NEW_ORDER",
+				Map.of("invoiceId", invoiceId, "tableId", invoice.getTable().getId()));
 
-        return saved;
-    }
+		return saved;
+	}
 
-    @Override
-    public InvoiceItemEntity updateStatus(Long id, InvoiceItemStatus status) {
-        InvoiceItemEntity item = getInvoiceItemById(id);
+	@Override
+	public InvoiceItemEntity updateStatus(Long id, InvoiceItemStatus status) {
+		InvoiceItemEntity item = getInvoiceItemById(id);
 
-        // ❗ Validate flow (rất quan trọng)
-        if (item.getStatus() == InvoiceItemStatus.SERVED) {
-            throw new BadRequestException("Cannot update status of a served item");
-        }
+		if (item.getStatus() == InvoiceItemStatus.SERVED) {
+			throw new BadRequestException("Cannot update status of a served item");
+		}
 
-        if (item.getStatus() == InvoiceItemStatus.CANCELLED) {
-            throw new BadRequestException("Cannot update status of a cancelled item");
-        }
+		if (item.getStatus() == InvoiceItemStatus.CANCELLED) {
+			throw new BadRequestException("Cannot update status of a cancelled item");
+		}
 
-        // Lưu lại trạng thái cũ để kiểm tra
-        InvoiceItemStatus oldStatus = item.getStatus();
-        
-        item.setStatus(status);
-        item.setUpdatedAt(LocalDateTime.now());
+		InvoiceItemStatus oldStatus = item.getStatus();
 
-        // Lưu món ăn trước
-        InvoiceItemEntity savedItem = invoiceItemRepository.saveAndFlush(item);
-        
-        // Xử lý cập nhật tổng tiền hóa đơn nếu món bị HỦY
-        if (status == InvoiceItemStatus.CANCELLED && oldStatus != InvoiceItemStatus.CANCELLED) {
-            InvoiceEntity invoice = savedItem.getInvoice();
-            if (invoice != null) {
-                // Lấy tổng tiền hiện tại trừ đi tiền món vừa hủy
-                BigDecimal currentTotal = invoice.getTotalAmount();
-                if (currentTotal == null) currentTotal = BigDecimal.ZERO;
-                
-                BigDecimal itemPrice = savedItem.getTotalPrice();
-                if (itemPrice == null) itemPrice = BigDecimal.ZERO;
-                
-                BigDecimal newTotal = currentTotal.subtract(itemPrice);
-                
-                // Đảm bảo tổng tiền không âm (phòng trường hợp dữ liệu sai lệch)
-                if (newTotal.compareTo(BigDecimal.ZERO) < 0) {
-                    newTotal = BigDecimal.ZERO;
-                }
-                
-                invoice.setTotalAmount(newTotal);
-                // Lưu lại hóa đơn với tổng tiền mới
-                invoiceService.updateInvoice(invoice.getId(), invoice);
-            }
-        }
+		item.setStatus(status);
+		item.setUpdatedAt(LocalDateTime.now());
 
-        // Gửi thông báo WebSocket
-        if (savedItem.getInvoice() != null) {
-            webSocketService.sendInvoiceItemStatusUpdate(
-                savedItem.getInvoice().getId(), 
-                savedItem.getId(), 
-                status.name()
-            );
-        }
+		InvoiceItemEntity savedItem = invoiceItemRepository.saveAndFlush(item);
 
-        return savedItem;
-    }
+		if (status == InvoiceItemStatus.CANCELLED && oldStatus != InvoiceItemStatus.CANCELLED) {
+			InvoiceEntity invoice = savedItem.getInvoice();
+			if (invoice != null) {
+				BigDecimal currentTotal = invoice.getTotalAmount();
+				if (currentTotal == null)
+					currentTotal = BigDecimal.ZERO;
+
+				BigDecimal itemPrice = savedItem.getTotalPrice();
+				if (itemPrice == null)
+					itemPrice = BigDecimal.ZERO;
+
+				BigDecimal newTotal = currentTotal.subtract(itemPrice);
+
+				if (newTotal.compareTo(BigDecimal.ZERO) < 0) {
+					newTotal = BigDecimal.ZERO;
+				}
+
+				invoice.setTotalAmount(newTotal);
+				invoiceService.updateInvoice(invoice.getId(), invoice);
+			}
+		}
+
+		if (savedItem.getInvoice() != null) {
+			webSocketService.sendInvoiceItemStatusUpdate(
+					savedItem.getInvoice().getId(),
+					savedItem.getId(),
+					status.name());
+		}
+
+		return savedItem;
+	}
 }

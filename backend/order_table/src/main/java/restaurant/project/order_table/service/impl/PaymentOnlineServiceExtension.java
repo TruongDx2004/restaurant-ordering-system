@@ -34,10 +34,6 @@ public class PaymentOnlineServiceExtension {
 	private final RestTemplate restTemplate;
 	private final ObjectMapper objectMapper;
 
-	// =====================================================
-	// MoMo
-	// =====================================================
-
 	public OnlinePaymentInitResponse initiateMomoPayment(MomoPaymentInitRequest req) {
 		InvoiceEntity invoice = validateInvoiceForPayment(req.getInvoiceId());
 
@@ -156,10 +152,6 @@ public class PaymentOnlineServiceExtension {
 			return "{\"RspCode\":\"01\",\"Message\":\"Confirm Fail\"}";
 		}
 	}
-
-	// =====================================================
-	// COMMON
-	// =====================================================
 
 	private InvoiceEntity validateInvoiceForPayment(Long invoiceId) {
 		InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);

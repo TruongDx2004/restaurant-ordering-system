@@ -11,11 +11,10 @@ import restaurant.project.order_table.entity.InvoiceItemEntity;
 
 public interface InvoiceItemRepository extends JpaRepository<InvoiceItemEntity, Long> {
 
-    List<InvoiceItemEntity> findByInvoiceId(Long invoiceId);
+	List<InvoiceItemEntity> findByInvoiceId(Long invoiceId);
 
-    List<InvoiceItemEntity> findByDishId(Long dishId);
+	List<InvoiceItemEntity> findByDishId(Long dishId);
 
-    @Query("SELECT SUM(i.totalPrice) FROM InvoiceItemEntity i WHERE i.invoice.id = :invoiceId AND i.status <> restaurant.project.order_table.entity.enums.InvoiceItemStatus.CANCELLED")
-    BigDecimal calculateTotalExcludingCancelled(@Param("invoiceId") Long invoiceId);
+	@Query("SELECT SUM(i.totalPrice) FROM InvoiceItemEntity i WHERE i.invoice.id = :invoiceId AND i.status <> restaurant.project.order_table.entity.enums.InvoiceItemStatus.CANCELLED")
+	BigDecimal calculateTotalExcludingCancelled(@Param("invoiceId") Long invoiceId);
 }
-
