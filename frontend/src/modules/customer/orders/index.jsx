@@ -37,7 +37,7 @@ const Orders = () => {
     const unsubscribeOrders = webSocketService.subscribe('/topic/orders', (message) => {
       console.log('[New Orders] Received WebSocket new:', message);
 
-      if(message.orderId == invoice.id){
+      if(message.invoiceId == invoice.id){
         showToast('Đơn hàng mới đã được cập nhật!', 'info');
         refetch();
       }
