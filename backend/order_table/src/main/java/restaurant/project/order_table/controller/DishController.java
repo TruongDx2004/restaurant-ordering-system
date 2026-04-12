@@ -38,9 +38,9 @@ public class DishController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<DishResponse> createDish(
             @ModelAttribute DishCreateRequest request) {
-
+        System.out.println("Received DishCreateRequest: " + request);                
         DishEntity created = dishService.createDish(request);
-
+                
         return ApiResponse.success(
                 dishMapper.toResponse(created),
                 "Món ăn đã được tạo thành công");

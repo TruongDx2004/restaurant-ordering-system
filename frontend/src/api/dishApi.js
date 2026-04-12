@@ -106,7 +106,12 @@ export const dishApi = {
     try {
       const response = await axiosInstance.post(
         DISH_ENDPOINTS.CREATE,
-        dishData
+        dishData,
+        {
+          headers: dishData instanceof FormData
+            ? { "Content-Type": "multipart/form-data" }
+            : { "Content-Type": "application/json" },
+        }
       );
       return response;
     } catch (error) {
