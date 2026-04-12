@@ -124,7 +124,7 @@ const paymentApi = {
    */
   createMoMoPayment: async (paymentData) => {
     try {
-      const response = await axiosInstance.post('/payments/momo', paymentData);
+      const response = await axiosInstance.post('/paymentsonline/momo/create', paymentData);
       return response;
     } catch (error) {
       throw error;

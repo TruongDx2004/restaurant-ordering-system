@@ -67,7 +67,7 @@ export const useInvoicePayment = () => {
         orderInfo: `Thanh toán hóa đơn #${invoiceId}`
       });
 
-      const momoUrl = response.data?.payUrl;
+      const momoUrl = response.data?.paymentUrl;
 
       if (response.success && momoUrl) {
         window.location.href = momoUrl;
