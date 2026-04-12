@@ -89,7 +89,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 		invoice.setStatus(status);
 		InvoiceEntity savedInvoice = invoiceRepository.save(invoice);
 
-		// Gửi thông báo WebSocket về trạng thái hóa đơn/thanh toán
 		if (savedInvoice.getTable() != null) {
 			webSocketService.sendPaymentNotification(
 					savedInvoice.getId(),
@@ -108,11 +107,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 	@Override
 	public InvoiceEntity getActiveInvoiceByTableNumber(Integer tableNumber) {
-		// Find table by table number
 		TableEntity table = tableRepository.findByTableNumber(tableNumber)
 				.orElseThrow(() -> new BadRequestException("Table not found with number: " + tableNumber));
 
-		// Get active invoice for this table
 		List<InvoiceEntity> invoices = invoiceRepository.findByTableIdAndStatus(table.getId(), InvoiceStatus.OPEN);
 		return invoices.isEmpty() ? null : invoices.get(0);
 	}
@@ -123,16 +120,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 		InvoiceEntity invoice = invoiceRepository.findById(id)
 				.orElseThrow(() -> new BadRequestException("Invoice not found with id: " + id));
 
-		// Dùng truy vấn SQL trực tiếp để tính tổng tiền (luôn chính xác và bỏ qua món
-		// đã hủy)
 		BigDecimal total = invoiceItemRepository.calculateTotalExcludingCancelled(id);
 
-		// Nếu không còn món nào, tổng tiền là 0
 		if (total == null) {
 			total = BigDecimal.ZERO;
 		}
 
-		// Cập nhật và lưu vào database
 		invoice.setTotalAmount(total);
 		invoiceRepository.saveAndFlush(invoice);
 
@@ -146,62 +139,45 @@ public class InvoiceServiceImpl implements InvoiceService {
 		TableEntity table = tableRepository.findById(tableId)
 				.orElseThrow(() -> new BadRequestException("Table not found with id: " + tableId));
 
-		// Kiểm tra trạng thái bàn và hóa đơn
-		// Logic:
-		// - Nếu bàn AVAILABLE -> Tạo invoice mới, chuyển bàn sang OCCUPIED
-		// - Nếu bàn OCCUPIED + có invoice OPEN -> Thêm món vào invoice hiện tại
-		// - Nếu bàn OCCUPIED + không có invoice OPEN -> Lỗi (đã thanh toán nhưng chưa
-		// reset bàn)
-
 		InvoiceEntity invoice = null;
 
 		if (table.getStatus() == TableStatus.AVAILABLE) {
-			// Bàn trống -> Tạo invoice mới
+
 			invoice = new InvoiceEntity();
 			invoice.setTable(table);
 			invoice.setStatus(InvoiceStatus.OPEN);
 			invoice.setTotalAmount(BigDecimal.ZERO);
 			invoice.setItems(new ArrayList<>());
 
-			// Chuyển trạng thái bàn sang OCCUPIED
 			table.setStatus(TableStatus.OCCUPIED);
 			tableRepository.save(table);
 
-			// Save invoice first to get ID
 			invoice = invoiceRepository.save(invoice);
 
 		} else if (table.getStatus() == TableStatus.OCCUPIED) {
-			// Bàn đang được sử dụng -> Tìm invoice OPEN
 			invoice = getActiveInvoiceByTable(tableId);
 
 			if (invoice == null) {
-				// Bàn OCCUPIED nhưng không có invoice OPEN -> Lỗi nghiệp vụ
 				throw new BadRequestException(
 						"Table is occupied but has no active invoice. Please check table status or contact staff.");
 			}
-			// Nếu có invoice OPEN -> Thêm món vào invoice hiện tại
 
 		} else {
-			// Bàn đang bảo trì hoặc đã đặt -> Không cho phép order
 			throw new BadRequestException(
 					"Table is not available for ordering. Status: " + table.getStatus());
 		}
 
-		// Get existing items for this invoice (để check trùng món)
 		List<InvoiceItemEntity> existingItems = invoice.getItems();
 		BigDecimal totalAmount = invoice.getTotalAmount();
 
-		// Add new items to invoice
 		for (ItemData itemData : items) {
-			// Get dish
 			DishEntity dish = dishRepository.findById(itemData.dishId)
 					.orElseThrow(() -> new BadRequestException("Dish not found with id: " + itemData.dishId));
 			if (dish.getStatus() != DishStatus.AVAILABLE) {
 				throw new BadRequestException(
 						"Món " + dish.getName() + " hiện tại đã hết, vui lòng gọi món khác");
 			}
-			// Kiểm tra xem món đã có trong hóa đơn chưa (dựa trên dishId), cùng trạng thái
-			// (WATTING)
+
 			InvoiceItemEntity existingItem = existingItems.stream()
 					.filter(item -> item.getDish().getId().equals(itemData.dishId)
 							&& item.getStatus() == itemData.status)
@@ -209,23 +185,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 					.orElse(null);
 
 			if (existingItem != null) {
-				// Món đã có trong hóa đơn -> Cộng dồn số lượng
 				int oldQuantity = existingItem.getQuantity();
 				int newQuantity = oldQuantity + itemData.quantity;
 
 				existingItem.setQuantity(newQuantity);
 
-				// Recalculate total price for this item
 				BigDecimal unitPrice = existingItem.getUnitPrice();
 				BigDecimal newItemTotal = unitPrice.multiply(BigDecimal.valueOf(newQuantity));
 
-				// Update total amount (subtract old, add new)
 				totalAmount = totalAmount.subtract(existingItem.getTotalPrice());
 				existingItem.setTotalPrice(newItemTotal);
 				totalAmount = totalAmount.add(newItemTotal);
 
 			} else {
-				// Món mới -> Tạo invoice item mới
 				InvoiceItemEntity invoiceItem = new InvoiceItemEntity();
 				invoiceItem.setInvoice(invoice);
 				invoiceItem.setStatus(itemData.status != null ? itemData.status : InvoiceItemStatus.WAITING);
@@ -233,11 +205,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 				invoiceItem.setDish(dish);
 				invoiceItem.setQuantity(itemData.quantity);
 
-				// Convert price from Integer to BigDecimal
 				BigDecimal unitPrice = BigDecimal.valueOf(dish.getPrice());
 				invoiceItem.setUnitPrice(unitPrice);
 
-				// Calculate total price for this item
 				BigDecimal quantityBD = BigDecimal.valueOf(itemData.quantity);
 				BigDecimal itemTotal = unitPrice.multiply(quantityBD);
 				invoiceItem.setTotalPrice(itemTotal);
@@ -247,13 +217,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 			}
 		}
 
-		// Update invoice total amount
 		invoice.setTotalAmount(totalAmount);
-
-		// Save invoice with updated items
 		InvoiceEntity savedInvoice = invoiceRepository.save(invoice);
 
-		// Gửi thông báo WebSocket
 		webSocketService.sendNewOrderNotification(
 				savedInvoice.getId(),
 				table.getId(),

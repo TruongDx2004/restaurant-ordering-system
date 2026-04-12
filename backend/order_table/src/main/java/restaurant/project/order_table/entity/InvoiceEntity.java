@@ -23,43 +23,35 @@ import restaurant.project.order_table.entity.enums.InvoiceStatus;
 @Builder
 public class InvoiceEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    /** Bàn nào */
-    @ManyToOne
-    @JoinColumn(name = "table_id", nullable = false)
-    private TableEntity table;
+	@ManyToOne
+	@JoinColumn(name = "table_id", nullable = false)
+	private TableEntity table;
 
-    /** Tổng tiền */
-    @Column(nullable = false)
-    private BigDecimal totalAmount;
+	@Column(nullable = false)
+	private BigDecimal totalAmount;
 
-    /** Trạng thái hóa đơn */
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private InvoiceStatus status;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private InvoiceStatus status;
 
-    /** Thời điểm tạo */
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-    /** Thời điểm cập nhật */
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 
-    /** Thời điểm thanh toán */
-    @Column(name = "paid_at")
-    private LocalDateTime paidAt;
+	@Column(name = "paid_at")
+	private LocalDateTime paidAt;
 
-    /** Soft delete */
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
-    /** Danh sách món */
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
-    private List<InvoiceItemEntity> items;
+	@OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
+	private List<InvoiceItemEntity> items;
 }

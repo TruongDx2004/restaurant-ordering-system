@@ -21,52 +21,42 @@ import restaurant.project.order_table.entity.enums.RecipientType;
 @SQLRestriction("deleted_at IS NULL")
 public class NotificationEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    /** Tiêu đề */
-    @Column(nullable = false)
-    private String title;
+	@Column(nullable = false)
+	private String title;
 
-    /** Nội dung thông báo */
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String message;
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String message;
 
-    /** Loại sự kiện WebSocket (e.g. "NEW_ORDER", "PAYMENT_SUCCESS") */
-    @Column(nullable = false)
-    private String type;
+	@Column(nullable = false)
+	private String type;
 
-    /** USER | ROLE | ALL */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "recipient_type")
-    @Builder.Default
-    private RecipientType recipientType = RecipientType.ALL;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "recipient_type")
+	@Builder.Default
+	private RecipientType recipientType = RecipientType.ALL;
 
-    /** ID người nhận (null = broadcast cho tất cả loại recipientType đó) */
-    @Column(name = "recipient_id")
-    private Long recipientId;
+	@Column(name = "recipient_id")
+	private Long recipientId;
 
-    /** Đã đọc hay chưa */
-    @Builder.Default
-    @Column(name = "is_read", nullable = false)
-    private Boolean read = false;
+	@Builder.Default
+	@Column(name = "is_read", nullable = false)
+	private Boolean read = false;
 
-    /** Dữ liệu kèm theo (lưu dạng JSON string) */
-    @Column(columnDefinition = "TEXT")
-    private String data;
+	@Column(columnDefinition = "TEXT")
+	private String data;
 
-    /** Thời điểm tạo */
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-    /** Thời điểm cập nhật */
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 
-    /** Soft delete */
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 }

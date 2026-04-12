@@ -112,7 +112,6 @@ public class NotificationServiceImpl implements NotificationService {
 			String type, Object data) {
 		NotificationEntity notification = new NotificationEntity();
 		notification.setRecipientType(recipientType);
-		// 0L = broadcast tới tất cả recipient của loại này
 		notification.setRecipientId(recipientId != null ? recipientId : 0L);
 		notification.setTitle(title);
 		notification.setType(type);
@@ -121,8 +120,6 @@ public class NotificationServiceImpl implements NotificationService {
 
 		NotificationEntity saved = notificationRepository.save(notification);
 
-		// Gửi WebSocket tương đương JS: webSocketService.sendGlobalNotification(type,
-		// message, {...data, id, createdAt, type, title})
 		Map<String, Object> payload = new HashMap<>();
 		if (data instanceof Map<?, ?> rawMap) {
 			rawMap.forEach((k, v) -> payload.put(String.valueOf(k), v));

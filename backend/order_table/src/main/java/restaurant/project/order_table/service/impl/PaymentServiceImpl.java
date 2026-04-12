@@ -33,163 +33,156 @@ import restaurant.project.order_table.websocket.WebSocketService;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final InvoiceService invoiceService;
-    private final TableRepository tableRepository;
-    private final InvoiceItemRepository invoiceItemRepository;
-    private final NotificationService notificationService;
-    private final WebSocketService webSocketService;
+	private final PaymentRepository paymentRepository;
+	private final InvoiceService invoiceService;
+	private final TableRepository tableRepository;
+	private final InvoiceItemRepository invoiceItemRepository;
+	private final NotificationService notificationService;
+	private final WebSocketService webSocketService;
 
-    @Override
-    public PaymentEntity createPayment(PaymentEntity payment) {
-        return paymentRepository.save(payment);
-    }
+	@Override
+	public PaymentEntity createPayment(PaymentEntity payment) {
+		return paymentRepository.save(payment);
+	}
 
-    @Override
-    public PaymentEntity getPaymentById(Long id) {
-        return paymentRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Payment not found with id: " + id));
-    }
+	@Override
+	public PaymentEntity getPaymentById(Long id) {
+		return paymentRepository.findById(id)
+				.orElseThrow(() -> new BadRequestException("Payment not found with id: " + id));
+	}
 
-    @Override
-    public List<PaymentEntity> getAllPayments() {
-        return paymentRepository.findAll();
-    }
+	@Override
+	public List<PaymentEntity> getAllPayments() {
+		return paymentRepository.findAll();
+	}
 
-    @Override
-    public PaymentEntity updatePayment(Long id, PaymentEntity payment) {
-        PaymentEntity existing = getPaymentById(id);
-        existing.setInvoice(payment.getInvoice());
-        existing.setAmount(payment.getAmount());
-        existing.setMethod(payment.getMethod());
-        existing.setStatus(payment.getStatus());
-        existing.setTransactionCode(payment.getTransactionCode());
-        return paymentRepository.save(existing);
-    }
+	@Override
+	public PaymentEntity updatePayment(Long id, PaymentEntity payment) {
+		PaymentEntity existing = getPaymentById(id);
+		existing.setInvoice(payment.getInvoice());
+		existing.setAmount(payment.getAmount());
+		existing.setMethod(payment.getMethod());
+		existing.setStatus(payment.getStatus());
+		existing.setTransactionCode(payment.getTransactionCode());
+		return paymentRepository.save(existing);
+	}
 
-    @Override
-    public void deletePayment(Long id) {
-        paymentRepository.delete(getPaymentById(id));
-    }
+	@Override
+	public void deletePayment(Long id) {
+		paymentRepository.delete(getPaymentById(id));
+	}
 
-    @Override
-    public PaymentEntity getPaymentByInvoice(Long invoiceId) {
-        return paymentRepository.findByInvoiceId(invoiceId)
-                .orElseThrow(() -> new BadRequestException("Payment not found for invoice: " + invoiceId));
-    }
+	@Override
+	public PaymentEntity getPaymentByInvoice(Long invoiceId) {
+		return paymentRepository.findByInvoiceId(invoiceId)
+				.orElseThrow(() -> new BadRequestException("Payment not found for invoice: " + invoiceId));
+	}
 
-    @Override
-    public PaymentEntity getPaymentByTransactionCode(String transactionCode) {
-        return paymentRepository.findByTransactionCode(transactionCode)
-                .orElseThrow(() -> new BadRequestException("Payment not found: " + transactionCode));
-    }
+	@Override
+	public PaymentEntity getPaymentByTransactionCode(String transactionCode) {
+		return paymentRepository.findByTransactionCode(transactionCode)
+				.orElseThrow(() -> new BadRequestException("Payment not found: " + transactionCode));
+	}
 
-    @Override
-    public List<PaymentEntity> getPaymentsByStatus(PaymentStatus status) {
-        return paymentRepository.findByStatus(status);
-    }
+	@Override
+	public List<PaymentEntity> getPaymentsByStatus(PaymentStatus status) {
+		return paymentRepository.findByStatus(status);
+	}
 
-    @Override
-    public List<PaymentEntity> getPaymentsByMethod(PaymentMethod method) {
-        return paymentRepository.findByMethod(method);
-    }
+	@Override
+	public List<PaymentEntity> getPaymentsByMethod(PaymentMethod method) {
+		return paymentRepository.findByMethod(method);
+	}
 
-    @Override
-    public PaymentEntity updatePaymentStatus(Long id, PaymentStatus status) {
-        PaymentEntity payment = getPaymentById(id);
-        payment.setStatus(status);
-        if (status == PaymentStatus.SUCCESS) {
-            payment.setPaidAt(LocalDateTime.now());
-            invoiceService.updateInvoiceStatus(payment.getInvoice().getId(), InvoiceStatus.PAID);
-        }
-        return paymentRepository.save(payment);
-    }
+	@Override
+	public PaymentEntity updatePaymentStatus(Long id, PaymentStatus status) {
+		PaymentEntity payment = getPaymentById(id);
+		payment.setStatus(status);
+		if (status == PaymentStatus.SUCCESS) {
+			payment.setPaidAt(LocalDateTime.now());
+			invoiceService.updateInvoiceStatus(payment.getInvoice().getId(), InvoiceStatus.PAID);
+		}
+		return paymentRepository.save(payment);
+	}
 
-    @Override
-    @Transactional
-    public PaymentEntity processPayment(Long invoiceId, PaymentMethod method, BigDecimal amount) {
-        InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
+	@Override
+	@Transactional
+	public PaymentEntity processPayment(Long invoiceId, PaymentMethod method, BigDecimal amount) {
+		InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
 
-        if (invoice.getStatus() == InvoiceStatus.PAID) {
-            throw new BadRequestException("Invoice is already paid");
-        }
+		if (invoice.getStatus() == InvoiceStatus.PAID) {
+			throw new BadRequestException("Invoice is already paid");
+		}
 
-        // Kiểm tra tất cả món phải SERVED hoặc CANCELLED trước khi thanh toán
-        List<InvoiceItemEntity> items = invoiceItemRepository.findByInvoiceId(invoiceId);
-        boolean hasUnserved = items.stream().anyMatch(
-                item -> item.getStatus() != InvoiceItemStatus.SERVED
-                        && item.getStatus() != InvoiceItemStatus.CANCELLED);
-        if (hasUnserved) {
-            throw new BadRequestException("Không thể thanh toán khi còn món chưa được phục vụ");
-        }
+		List<InvoiceItemEntity> items = invoiceItemRepository.findByInvoiceId(invoiceId);
+		boolean hasUnserved = items.stream().anyMatch(
+				item -> item.getStatus() != InvoiceItemStatus.SERVED
+						&& item.getStatus() != InvoiceItemStatus.CANCELLED);
+		if (hasUnserved) {
+			throw new BadRequestException("Không thể thanh toán khi còn món chưa được phục vụ");
+		}
 
-        paymentRepository.findByInvoiceId(invoiceId).ifPresent(p -> {
-            throw new BadRequestException("Payment already exists for this invoice");
-        });
+		paymentRepository.findByInvoiceId(invoiceId).ifPresent(p -> {
+			throw new BadRequestException("Payment already exists for this invoice");
+		});
 
-        PaymentEntity payment = new PaymentEntity();
-        payment.setInvoice(invoice);
-        payment.setMethod(method);
-        payment.setAmount(amount);
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setPaidAt(LocalDateTime.now());
-        payment.setTransactionCode(generateTransactionCode());
-        payment = paymentRepository.save(payment);
+		PaymentEntity payment = new PaymentEntity();
+		payment.setInvoice(invoice);
+		payment.setMethod(method);
+		payment.setAmount(amount);
+		payment.setStatus(PaymentStatus.SUCCESS);
+		payment.setPaidAt(LocalDateTime.now());
+		payment.setTransactionCode(generateTransactionCode());
+		payment = paymentRepository.save(payment);
 
-        invoiceService.updateInvoiceStatus(invoice.getId(), InvoiceStatus.PAID);
+		invoiceService.updateInvoiceStatus(invoice.getId(), InvoiceStatus.PAID);
 
-        TableEntity table = invoice.getTable();
-        if (table != null && table.getStatus() == TableStatus.OCCUPIED) {
-            table.setStatus(TableStatus.AVAILABLE);
-            tableRepository.save(table);
-        }
+		TableEntity table = invoice.getTable();
+		if (table != null && table.getStatus() == TableStatus.OCCUPIED) {
+			table.setStatus(TableStatus.AVAILABLE);
+			tableRepository.save(table);
+		}
 
-        return payment;
-    }
+		return payment;
+	}
 
-    @Override
-    @Transactional
-    public PaymentEntity confirmPayment(Long id, String transactionCode) {
-        PaymentEntity payment = getPaymentById(id);
-        if (payment.getStatus() == PaymentStatus.SUCCESS) {
-            throw new BadRequestException("Payment already completed");
-        }
-        payment.setTransactionCode(transactionCode);
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setPaidAt(LocalDateTime.now());
+	@Override
+	@Transactional
+	public PaymentEntity confirmPayment(Long id, String transactionCode) {
+		PaymentEntity payment = getPaymentById(id);
+		if (payment.getStatus() == PaymentStatus.SUCCESS) {
+			throw new BadRequestException("Payment already completed");
+		}
+		payment.setTransactionCode(transactionCode);
+		payment.setStatus(PaymentStatus.SUCCESS);
+		payment.setPaidAt(LocalDateTime.now());
 
-        InvoiceEntity invoice = payment.getInvoice();
-        invoiceService.updateInvoiceStatus(invoice.getId(), InvoiceStatus.PAID);
+		InvoiceEntity invoice = payment.getInvoice();
+		invoiceService.updateInvoiceStatus(invoice.getId(), InvoiceStatus.PAID);
 
-        TableEntity table = invoice.getTable();
-        if (table != null && table.getStatus() == TableStatus.OCCUPIED) {
-            table.setStatus(TableStatus.AVAILABLE);
-            tableRepository.save(table);
-        }
-        return paymentRepository.save(payment);
-    }
+		TableEntity table = invoice.getTable();
+		if (table != null && table.getStatus() == TableStatus.OCCUPIED) {
+			table.setStatus(TableStatus.AVAILABLE);
+			tableRepository.save(table);
+		}
+		return paymentRepository.save(payment);
+	}
 
-    @Override
-    public PaymentEntity cancelPayment(Long id) {
-        PaymentEntity payment = getPaymentById(id);
-        if (payment.getStatus() == PaymentStatus.SUCCESS) {
-            throw new BadRequestException("Cannot cancel completed payment");
-        }
-        // Fix: đặt FAILED thay vì SUCCESS (bug cũ)
-        payment.setStatus(PaymentStatus.FAILED);
-        return paymentRepository.save(payment);
-    }
+	@Override
+	public PaymentEntity cancelPayment(Long id) {
+		PaymentEntity payment = getPaymentById(id);
+		if (payment.getStatus() == PaymentStatus.SUCCESS) {
+			throw new BadRequestException("Cannot cancel completed payment");
+		}
+		payment.setStatus(PaymentStatus.FAILED);
+		return paymentRepository.save(payment);
+	}
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // CÁC NGHIỆP VỤ MỚI TỪ JS
-    // ─────────────────────────────────────────────────────────────────────────
-
-    @Override
+	@Override
     @Transactional
     public void requestCashPayment(Long invoiceId, Long tableId, BigDecimal amount) {
         InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
 
-        // Kiểm tra tất cả món phải SERVED hoặc CANCELLED
         List<InvoiceItemEntity> items = invoiceItemRepository.findByInvoiceId(invoiceId);
         boolean hasUnserved = items.stream().anyMatch(
                 item -> item.getStatus() != InvoiceItemStatus.SERVED
@@ -198,14 +191,12 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BadRequestException("Không thể yêu cầu thanh toán khi còn món chưa được phục vụ");
         }
 
-        // Kiểm tra hóa đơn chưa thanh toán
         paymentRepository.findByInvoiceId(invoiceId).ifPresent(p -> {
             if (p.getStatus() == PaymentStatus.SUCCESS) {
                 throw new BadRequestException("Hóa đơn đã được thanh toán thành công trước đó");
             }
         });
-
-        // Gửi thông báo tới nhân viên (không tạo Payment ở đây)
+)
         String amountFormatted = String.format("%,.0f", amount.doubleValue());
         notificationService.createAndSend(
                 RecipientType.USER, 0L,
@@ -216,59 +207,56 @@ public class PaymentServiceImpl implements PaymentService {
                         "amount", amount, "action", "CONFIRM_PAYMENT"));
     }
 
-    @Override
-    @Transactional
-    public PaymentEntity confirmPaymentByInvoice(Long invoiceId, String transactionCode) {
-        LocalDateTime now = LocalDateTime.now();
-        String txCode = (transactionCode != null && !transactionCode.isBlank())
-                ? transactionCode
-                : "CASH-" + System.currentTimeMillis();
+	@Override
+	@Transactional
+	public PaymentEntity confirmPaymentByInvoice(Long invoiceId, String transactionCode) {
+		LocalDateTime now = LocalDateTime.now();
+		String txCode = (transactionCode != null && !transactionCode.isBlank())
+				? transactionCode
+				: "CASH-" + System.currentTimeMillis();
 
-        // Upsert: tạo mới nếu chưa có, cập nhật nếu đã có
-        PaymentEntity payment = paymentRepository.findByInvoiceId(invoiceId).orElse(null);
+		PaymentEntity payment = paymentRepository.findByInvoiceId(invoiceId).orElse(null);
 
-        if (payment == null) {
-            InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
-            payment = new PaymentEntity();
-            payment.setInvoice(invoice);
-            payment.setAmount(invoice.getTotalAmount());
-            payment.setMethod(PaymentMethod.CASH);
-        }
+		if (payment == null) {
+			InvoiceEntity invoice = invoiceService.getInvoiceById(invoiceId);
+			payment = new PaymentEntity();
+			payment.setInvoice(invoice);
+			payment.setAmount(invoice.getTotalAmount());
+			payment.setMethod(PaymentMethod.CASH);
+		}
 
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setTransactionCode(txCode);
-        payment.setPaidAt(now);
-        payment = paymentRepository.save(payment);
+		payment.setStatus(PaymentStatus.SUCCESS);
+		payment.setTransactionCode(txCode);
+		payment.setPaidAt(now);
+		payment = paymentRepository.save(payment);
 
-        // Cập nhật invoice + bàn
-        invoiceService.updateInvoiceStatus(invoiceId, InvoiceStatus.PAID);
+		invoiceService.updateInvoiceStatus(invoiceId, InvoiceStatus.PAID);
 
-        TableEntity table = payment.getInvoice().getTable();
-        if (table != null) {
-            table.setStatus(TableStatus.AVAILABLE);
-            tableRepository.save(table);
-        }
+		TableEntity table = payment.getInvoice().getTable();
+		if (table != null) {
+			table.setStatus(TableStatus.AVAILABLE);
+			tableRepository.save(table);
+		}
 
-        // Thông báo + WebSocket
-        notificationService.createAndSend(
-                RecipientType.USER, 0L,
-                "Xác nhận thanh toán",
-                "Hóa đơn #" + invoiceId + " (Bàn " + (table != null ? table.getId() : "?")
-                        + ") đã được xác nhận thanh toán thành công.",
-                "PAYMENT_SUCCESS",
-                Map.of("invoiceId", invoiceId,
-                        "tableId", table != null ? table.getId() : 0L));
+		notificationService.createAndSend(
+				RecipientType.USER, 0L,
+				"Xác nhận thanh toán",
+				"Hóa đơn #" + invoiceId + " (Bàn " + (table != null ? table.getId() : "?")
+						+ ") đã được xác nhận thanh toán thành công.",
+				"PAYMENT_SUCCESS",
+				Map.of("invoiceId", invoiceId,
+						"tableId", table != null ? table.getId() : 0L));
 
-        webSocketService.sendPaymentNotification(invoiceId,
-                table != null ? table.getId() : 0L, "PAID");
-        webSocketService.sendTableStatusUpdate(
-                table != null ? table.getId() : 0L, "AVAILABLE", null);
+		webSocketService.sendPaymentNotification(invoiceId,
+				table != null ? table.getId() : 0L, "PAID");
+		webSocketService.sendTableStatusUpdate(
+				table != null ? table.getId() : 0L, "AVAILABLE", null);
 
-        return payment;
-    }
+		return payment;
+	}
 
-    private String generateTransactionCode() {
-        return "TXN-" + System.currentTimeMillis() + "-"
-                + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-    }
+	private String generateTransactionCode() {
+		return "TXN-" + System.currentTimeMillis() + "-"
+				+ UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+	}
 }
