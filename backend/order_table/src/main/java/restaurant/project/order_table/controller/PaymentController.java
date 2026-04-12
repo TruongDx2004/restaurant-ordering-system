@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import restaurant.project.order_table.dto.request.payment.CashPaymentRequest;
 import restaurant.project.order_table.dto.request.payment.ConfirmPaymentRequest;
@@ -49,6 +50,7 @@ public class PaymentController {
     }
 
     @PatchMapping("/confirm-by-invoice")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ApiResponse<PaymentResponse> confirmPaymentByInvoice(@Valid @RequestBody ConfirmPaymentRequest request) {
         PaymentEntity payment = paymentService.confirmPaymentByInvoice(
                 request.getInvoiceId(), request.getTransactionCode());

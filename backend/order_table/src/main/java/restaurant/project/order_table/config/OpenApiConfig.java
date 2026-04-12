@@ -33,8 +33,8 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Restaurant Team")
-                                .email("support@restaurant.com")
-                                .url("https://github.com/your-repo"))
+                                .email("doanxuantruong2110@gmail.com")
+                                .url("https://github.com/TruongDx2004/restaurant-ordering-system"))
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
@@ -43,10 +43,7 @@ public class OpenApiConfig {
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:" + serverPort)
-                                .description("Development Server"),
-                        new Server()
-                                .url("https://api.restaurant.com")
-                                .description("Production Server")))
+                                .description("Development Server")))
                 
                 // Security Configuration for JWT
                 .addSecurityItem(new SecurityRequirement()

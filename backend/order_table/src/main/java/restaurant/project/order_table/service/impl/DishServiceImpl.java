@@ -34,7 +34,6 @@ public class DishServiceImpl implements DishService {
                 .category(category)
                 .build();
 
-        // 🔥 xử lý image tại đây
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             String fileName = FileUtil.saveFile(request.getImage());
             dish.setImage("/uploads/" + fileName);
@@ -46,7 +45,7 @@ public class DishServiceImpl implements DishService {
     @Override
     public DishEntity getDishById(Long id) {
         return dishRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Dish not found with id: " + id));
+                .orElseThrow(() -> new BadRequestException("Không tìm thấy món ăn với id: " + id));
     }
 
     @Override
@@ -65,8 +64,7 @@ public class DishServiceImpl implements DishService {
 
         CategoryEntity category = categoryService.getCategoryById(request.getCategoryId());
         existing.setCategory(category);
-        System.out.println("IMAGE: " + request.getImage());
-        // 🔥 xử lý image ở đây
+        
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             String fileName = FileUtil.saveFile(request.getImage());
             existing.setImage("/uploads/" + fileName);

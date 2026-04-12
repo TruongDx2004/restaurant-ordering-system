@@ -57,7 +57,6 @@ public class ExcelServiceImpl implements ExcelService {
                 }
 
                 case "dish": {
-                    // Xây map tên danh mục (thường hóa) → entity, tương đương JS findOrCreate
                     Map<String, CategoryEntity> categoryMap = new HashMap<>();
                     categoryRepository.findAll().forEach(c ->
                             categoryMap.put(c.getName().trim().toLowerCase(), c));
@@ -78,7 +77,6 @@ public class ExcelServiceImpl implements ExcelService {
 
                 case "user": {
                     List<UserEntity> users = ExcelUtil.importUsers(file.getInputStream());
-                    // Mật khẩu mặc định "123456" — không đọc từ Excel (khớp với JS bcrypt("123456"))
                     users.forEach(user -> user.setPassword(passwordEncoder.encode("123456")));
                     userRepository.saveAll(users);
                     break;

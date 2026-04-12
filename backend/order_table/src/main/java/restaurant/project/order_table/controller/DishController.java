@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,6 +36,7 @@ public class DishController {
     private final DishMapper dishMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<DishResponse> createDish(
             @ModelAttribute DishCreateRequest request) {
@@ -61,6 +63,7 @@ public class DishController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<DishResponse> updateDish(@PathVariable Long id,@ModelAttribute DishUpdateRequest request) {
 
         DishEntity updated = dishService.updateDish(id, request);
@@ -71,6 +74,7 @@ public class DishController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> deleteDish(@PathVariable Long id) {
         dishService.deleteDish(id);
         return ApiResponse.success(null, "Món ăn đã được xóa thành công");
@@ -101,6 +105,7 @@ public class DishController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<DishResponse> updateDishStatus(
             @PathVariable Long id,
             @RequestParam DishStatus status) {

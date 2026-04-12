@@ -1,6 +1,8 @@
 package restaurant.project.order_table.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import restaurant.project.order_table.dto.request.restaurant_config.RestaurantConfigUpdateRequest;
 import restaurant.project.order_table.dto.response.ApiResponse;
@@ -28,6 +30,7 @@ public class RestaurantConfigController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<RestaurantConfigResponse> updateConfig(@RequestBody RestaurantConfigUpdateRequest request) {
         RestaurantConfigEntity entity = configMapper.toEntity(request);
         RestaurantConfigEntity updated = configService.updateConfig(entity);

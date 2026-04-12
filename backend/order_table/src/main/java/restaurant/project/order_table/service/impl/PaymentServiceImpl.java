@@ -196,7 +196,7 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new BadRequestException("Hóa đơn đã được thanh toán thành công trước đó");
             }
         });
-)
+        
         String amountFormatted = String.format("%,.0f", amount.doubleValue());
         notificationService.createAndSend(
                 RecipientType.USER, 0L,

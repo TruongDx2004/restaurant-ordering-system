@@ -42,7 +42,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	@Override
 	public InvoiceItemEntity getInvoiceItemById(Long id) {
 		return invoiceItemRepository.findById(id)
-				.orElseThrow(() -> new BadRequestException("Invoice item not found with id: " + id));
+				.orElseThrow(() -> new BadRequestException("Không tìm thấy mục hóa đơn với id: " + id));
 	}
 
 	@Override
@@ -53,7 +53,9 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	@Override
 	public InvoiceItemEntity updateInvoiceItem(Long id, InvoiceItemEntity invoiceItem) {
 		InvoiceItemEntity existingItem = getInvoiceItemById(id);
-
+		if(existingItem == null) {
+			throw new BadRequestException("Không tìm thấy mục hóa đơn với id: " + id);
+		}
 		existingItem.setDish(invoiceItem.getDish());
 		existingItem.setQuantity(invoiceItem.getQuantity());
 		existingItem.setUnitPrice(invoiceItem.getUnitPrice());

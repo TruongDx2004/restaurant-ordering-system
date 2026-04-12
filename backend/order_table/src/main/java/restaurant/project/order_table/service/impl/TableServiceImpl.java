@@ -22,7 +22,7 @@ public class TableServiceImpl implements TableService {
 		// Check if table number already exists
 		tableRepository.findByTableNumber(table.getTableNumber())
 				.ifPresent(t -> {
-					throw new BadRequestException("Table number already exists");
+					throw new BadRequestException("Số bàn đã tồn tại: " + table.getTableNumber());
 				});
 
 		return tableRepository.save(table);
@@ -31,7 +31,7 @@ public class TableServiceImpl implements TableService {
 	@Override
 	public TableEntity getTableById(Long id) {
 		return tableRepository.findById(id)
-				.orElseThrow(() -> new BadRequestException("Table not found with id: " + id));
+				.orElseThrow(() -> new BadRequestException("Bàn không tồn tại với id: " + id));
 	}
 
 	@Override
@@ -43,11 +43,10 @@ public class TableServiceImpl implements TableService {
 	public TableEntity updateTable(Long id, TableEntity table) {
 		TableEntity existingTable = getTableById(id);
 
-		// Check if new table number conflicts with another table
 		if (!existingTable.getTableNumber().equals(table.getTableNumber())) {
 			tableRepository.findByTableNumber(table.getTableNumber())
 					.ifPresent(t -> {
-						throw new BadRequestException("Table number already exists");
+						throw new BadRequestException("Số bàn đã tồn tại: " + table.getTableNumber());
 					});
 		}
 
@@ -68,7 +67,7 @@ public class TableServiceImpl implements TableService {
 	@Override
 	public TableEntity getTableByNumber(Integer tableNumber) {
 		return tableRepository.findByTableNumber(tableNumber)
-				.orElseThrow(() -> new BadRequestException("Table not found with number: " + tableNumber));
+				.orElseThrow(() -> new BadRequestException("Bàn không tồn tại với số bàn: " + tableNumber));
 	}
 
 	@Override

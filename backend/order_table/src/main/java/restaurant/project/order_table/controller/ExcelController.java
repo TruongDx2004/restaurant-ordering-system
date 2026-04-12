@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import restaurant.project.order_table.service.ExcelService;
@@ -21,6 +22,7 @@ public class ExcelController {
     private final ExcelService excelService;
 
     @PostMapping("/import/{entity}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> importExcel(@PathVariable String entity, @RequestParam("file") MultipartFile file) {
         if (!ExcelUtil.hasExcelFormat(file)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vui lòng tải lên file Excel (.xlsx)");
@@ -34,6 +36,7 @@ public class ExcelController {
     }
 
     @GetMapping("/export/{entity}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Resource> exportExcel(@PathVariable String entity) {
         String filename = entity + "s.xlsx";
         InputStreamResource file = new InputStreamResource(excelService.exportData(entity));

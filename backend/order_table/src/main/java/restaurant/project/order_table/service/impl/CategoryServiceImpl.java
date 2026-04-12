@@ -18,10 +18,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryEntity createCategory(CategoryEntity category) {
-        // Check if category name already exists
         categoryRepository.findByName(category.getName())
                 .ifPresent(c -> {
-                    throw new BadRequestException("Category name already exists");
+                    throw new BadRequestException("Danh mục đã tồn tại");
                 });
 
         return categoryRepository.save(category);
@@ -30,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryEntity getCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Category not found with id: " + id));
+                .orElseThrow(() -> new BadRequestException("Danh mục không tồn tại với id: " + id));
     }
 
     @Override
@@ -42,11 +41,10 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryEntity updateCategory(Long id, CategoryEntity category) {
         CategoryEntity existingCategory = getCategoryById(id);
 
-        // Check if new name conflicts with another category
         if (!existingCategory.getName().equals(category.getName())) {
             categoryRepository.findByName(category.getName())
                     .ifPresent(c -> {
-                        throw new BadRequestException("Category name already exists");
+                        throw new BadRequestException("Danh mục đã tồn tại");
                     });
         }
 
@@ -64,6 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryEntity getCategoryByName(String name) {
         return categoryRepository.findByName(name)
-                .orElseThrow(() -> new BadRequestException("Category not found with name: " + name));
+                .orElseThrow(() -> new BadRequestException("Danh mục không tồn tại với tên: " + name));
     }
 }

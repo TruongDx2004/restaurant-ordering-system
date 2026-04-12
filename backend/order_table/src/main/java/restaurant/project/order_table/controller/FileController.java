@@ -1,6 +1,8 @@
 package restaurant.project.order_table.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import restaurant.project.order_table.dto.response.ApiResponse;
@@ -17,6 +19,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             String filename = fileService.saveFile(file);

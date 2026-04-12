@@ -20,20 +20,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerEntity register(String fullName, String phone, String rawPassword) {
-        // Check phone number already exists
         customerRepository.findByPhone(phone)
                 .ifPresent(c -> {
-                    throw new BadRequestException("Phone number already registered");
+                    throw new BadRequestException("Số điện thoại đã được đăng ký");
                 });
 
-        // Create new customer entity
         CustomerEntity customer = new CustomerEntity();
         customer.setFullName(fullName);
         customer.setPhone(phone);
         customer.setPassword(passwordEncoder.encode(rawPassword));
         customer.setStatus("ACTIVE");
 
-        // Save to database
         return customerRepository.save(customer);
     }
 
@@ -41,14 +38,14 @@ public class CustomerServiceImpl implements CustomerService {
     public String login(String phone, String rawPassword) {
         CustomerEntity customer = customerRepository
                 .findByPhone(phone)
-                .orElseThrow(() -> new BadRequestException("Invalid phone or password"));
+                .orElseThrow(() -> new BadRequestException("Số điện thoại hoặc mật khẩu không đúng"));
 
         if (!"ACTIVE".equals(customer.getStatus())) {
-            throw new BadRequestException("Customer account is not active");
+            throw new BadRequestException("Tài khoản khách hàng không hoạt động");
         }
 
         if (!passwordEncoder.matches(rawPassword, customer.getPassword())) {
-            throw new BadRequestException("Invalid phone or password");
+            throw new BadRequestException("Số điện thoại hoặc mật khẩu không đúng");
         }
 
         // Generate JWT token

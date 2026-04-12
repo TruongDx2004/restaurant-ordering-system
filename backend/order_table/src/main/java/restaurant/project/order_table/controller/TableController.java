@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ public class TableController {
     private final TableMapper tableMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<TableResponse> createTable(@Valid @RequestBody TableCreateRequest request) {
         TableEntity entity = tableMapper.toEntity(request);
@@ -40,6 +42,7 @@ public class TableController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     public ApiResponse<List<TableResponse>> getAllTables() {
         List<TableResponse> tables = tableService.getAllTables().stream()
                 .map(tableMapper::toResponse)
@@ -48,6 +51,7 @@ public class TableController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<TableResponse> updateTable(
             @PathVariable Long id,
             @Valid @RequestBody TableUpdateRequest request) {

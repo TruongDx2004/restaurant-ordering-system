@@ -20,7 +20,7 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        log.info("Received a new web socket connection");
+        log.info("Có một client đã kết nối WebSocket");
     }
 
     @EventListener
@@ -30,12 +30,12 @@ public class WebSocketEventListener {
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         
         if (username != null) {
-            log.info("User disconnected: {}", username);
+            log.info("Người dùng đã ngắt kết nối: {}", username);
             
             WebSocketMessage message = WebSocketMessage.builder()
                     .type("LEAVE")
                     .sender(MessageSender.SYSTEM)
-                    .content(username + " left the chat")
+                    .content(username + " đã rời khỏi cuộc trò chuyện")
                     .build();
             
             messagingTemplate.convertAndSend("/topic/users", message);

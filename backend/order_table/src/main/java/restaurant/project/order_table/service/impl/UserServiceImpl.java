@@ -19,16 +19,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity createUser(UserEntity user) {
-        // Check if email already exists
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(u -> {
-                    throw new BadRequestException("Email already exists");
+                    throw new BadRequestException("Email đã tồn tại: " + user.getEmail());
                 });
 
-        // Check if phone already exists
         userRepository.findByPhone(user.getPhone())
                 .ifPresent(u -> {
-                    throw new BadRequestException("Phone number already exists");
+                    throw new BadRequestException("Số điện thoại đã tồn tại: " + user.getPhone());
                 });
 
         return userRepository.save(user);
@@ -37,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("User not found with id: " + id));
+                .orElseThrow(() -> new BadRequestException("Người dùng không tồn tại với id: " + id));
     }
 
     @Override
@@ -49,19 +47,17 @@ public class UserServiceImpl implements UserService {
     public UserEntity updateUser(Long id, UserEntity user) {
         UserEntity existingUser = getUserById(id);
 
-        // Check if new email conflicts with another user
         if (!existingUser.getEmail().equals(user.getEmail())) {
             userRepository.findByEmail(user.getEmail())
                     .ifPresent(u -> {
-                        throw new BadRequestException("Email already exists");
+                        throw new BadRequestException("Email đã tồn tại: " + user.getEmail());
                     });
         }
 
-        // Check if new phone conflicts with another user
         if (!existingUser.getPhone().equals(user.getPhone())) {
             userRepository.findByPhone(user.getPhone())
                     .ifPresent(u -> {
-                        throw new BadRequestException("Phone number already exists");
+                        throw new BadRequestException("Số điện thoại đã tồn tại: " + user.getPhone());
                     });
         }
 
@@ -82,13 +78,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new BadRequestException("User not found with email: " + email));
+                .orElseThrow(() -> new BadRequestException("Người dùng không tồn tại với email: " + email));
     }
 
     @Override
     public UserEntity getUserByPhone(String phone) {
         return userRepository.findByPhone(phone)
-                .orElseThrow(() -> new BadRequestException("User not found with phone: " + phone));
+                .orElseThrow(() -> new BadRequestException("Người dùng không tồn tại với số điện thoại: " + phone));
     }
 
     @Override

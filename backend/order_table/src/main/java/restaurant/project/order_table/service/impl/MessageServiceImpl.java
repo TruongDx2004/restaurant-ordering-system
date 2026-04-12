@@ -57,7 +57,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageEntity getMessageById(Long id) {
         return messageRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Message not found with id: " + id));
+                .orElseThrow(() -> new BadRequestException("Tin nhắn không tồn tại với id: " + id));
     }
 
     @Override
@@ -122,7 +122,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<ConversationResponse> getConversations() {
-        // Lấy tất cả bàn, sắp xếp theo tableNumber tương đương JS: order: [["tableNumber", "ASC"]]
         List<TableEntity> tables = tableRepository.findAll();
         tables.sort(Comparator.comparing(
                 TableEntity::getTableNumber,

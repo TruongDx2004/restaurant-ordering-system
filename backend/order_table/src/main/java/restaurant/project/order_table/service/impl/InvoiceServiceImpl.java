@@ -43,7 +43,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 	@Override
 	public InvoiceEntity getInvoiceById(Long id) {
 		return invoiceRepository.findById(id)
-				.orElseThrow(() -> new BadRequestException("Invoice not found with id: " + id));
+				.orElseThrow(() -> new BadRequestException("Không tìm thấy hóa đơn với id: " + id));
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 	@Override
 	public InvoiceEntity getActiveInvoiceByTableNumber(Integer tableNumber) {
 		TableEntity table = tableRepository.findByTableNumber(tableNumber)
-				.orElseThrow(() -> new BadRequestException("Table not found with number: " + tableNumber));
+				.orElseThrow(() -> new BadRequestException("Bàn không tồn tại với số: " + tableNumber));
 
 		List<InvoiceEntity> invoices = invoiceRepository.findByTableIdAndStatus(table.getId(), InvoiceStatus.OPEN);
 		return invoices.isEmpty() ? null : invoices.get(0);
@@ -118,7 +118,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 	@Transactional
 	public BigDecimal calculateInvoiceTotal(Long id) {
 		InvoiceEntity invoice = invoiceRepository.findById(id)
-				.orElseThrow(() -> new BadRequestException("Invoice not found with id: " + id));
+				.orElseThrow(() -> new BadRequestException("Không tìm thấy hóa đơn với id: " + id));
 
 		BigDecimal total = invoiceItemRepository.calculateTotalExcludingCancelled(id);
 
@@ -137,7 +137,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 	public InvoiceEntity createInvoiceWithItems(Long tableId, List<ItemData> items) {
 		// Validate table exists
 		TableEntity table = tableRepository.findById(tableId)
-				.orElseThrow(() -> new BadRequestException("Table not found with id: " + tableId));
+				.orElseThrow(() -> new BadRequestException("Bàn không tồn tại với id: " + tableId));
 
 		InvoiceEntity invoice = null;
 
@@ -159,12 +159,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 			if (invoice == null) {
 				throw new BadRequestException(
-						"Table is occupied but has no active invoice. Please check table status or contact staff.");
+						"Bàn đang được sử dụng nhưng không có hóa đơn hoạt động. Vui lòng kiểm tra trạng thái bàn hoặc liên hệ nhân viên.");
 			}
 
 		} else {
 			throw new BadRequestException(
-					"Table is not available for ordering. Status: " + table.getStatus());
+					"Bàn không khả dụng để đặt món. Trạng thái: " + table.getStatus());
 		}
 
 		List<InvoiceItemEntity> existingItems = invoice.getItems();
@@ -172,7 +172,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 		for (ItemData itemData : items) {
 			DishEntity dish = dishRepository.findById(itemData.dishId)
-					.orElseThrow(() -> new BadRequestException("Dish not found with id: " + itemData.dishId));
+					.orElseThrow(() -> new BadRequestException("Món không tồn tại với id: " + itemData.dishId));
 			if (dish.getStatus() != DishStatus.AVAILABLE) {
 				throw new BadRequestException(
 						"Món " + dish.getName() + " hiện tại đã hết, vui lòng gọi món khác");

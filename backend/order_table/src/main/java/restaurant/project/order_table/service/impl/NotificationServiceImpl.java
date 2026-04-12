@@ -32,7 +32,7 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public NotificationEntity getNotificationById(Long id) {
 		return notificationRepository.findById(id)
-				.orElseThrow(() -> new BadRequestException("Notification not found with id: " + id));
+				.orElseThrow(() -> new BadRequestException("Không tìm thấy thông báo với id: " + id));
 	}
 
 	@Override
@@ -123,12 +123,10 @@ public class NotificationServiceImpl implements NotificationService {
 		notification.setMessage(message);
 		notification.setRead(false);
 
-		// Serialize data to JSON if not null
 		if (data != null) {
 			try {
 				notification.setData(objectMapper.writeValueAsString(data));
 			} catch (JsonProcessingException e) {
-				// Log error or ignore if data is not critical
 				notification.setData(null);
 			}
 		}
