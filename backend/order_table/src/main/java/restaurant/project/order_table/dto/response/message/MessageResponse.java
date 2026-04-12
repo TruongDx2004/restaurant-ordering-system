@@ -2,6 +2,8 @@ package restaurant.project.order_table.dto.response.message;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,5 +23,6 @@ public class MessageResponse {
     private MessageSender sender;
     private Long invoiceId;
     private Long tableId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime createdAt;
 }

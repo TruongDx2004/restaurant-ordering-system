@@ -9,6 +9,8 @@ import restaurant.project.order_table.entity.enums.TableStatus;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class ConversationResponse {
     private TableStatus status;
     private MessageSender sender;
     private String lastMessage;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime lastTime;
     @Builder.Default
     private Integer unreadCount = 0;

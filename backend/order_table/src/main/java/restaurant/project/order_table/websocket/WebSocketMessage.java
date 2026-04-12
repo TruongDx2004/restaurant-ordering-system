@@ -8,6 +8,8 @@ import restaurant.project.order_table.entity.enums.MessageSender;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class WebSocketMessage {
     private Object data;           // Additional data (order, table info, etc.)
     private Long tableId;          // Table ID if relevant
     private Long invoiceId;         // Invoice ID if relevant
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime timestamp;
 
     public WebSocketMessage(String type, MessageSender sender, String content) {

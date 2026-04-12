@@ -2,6 +2,8 @@ package restaurant.project.order_table.dto.response.user;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +21,8 @@ public class UserResponse {
     private String name;
     private String phone;
     private Role role;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime updatedAt;
 }

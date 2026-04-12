@@ -2,6 +2,8 @@ package restaurant.project.order_table.dto.response.notification;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +24,6 @@ public class NotificationResponse {
     private String type;
     private String data;
     private Boolean read;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime createdAt;
 }
