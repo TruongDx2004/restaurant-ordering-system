@@ -34,9 +34,6 @@ public class MomoUtil {
 	@Value("${momo.api-endpoint}")
 	private String apiEndpoint;
 
-	// =========================================================
-	// CREATE PAYMENT REQUEST
-	// =========================================================
 	public MomoPaymentRequest buildPaymentRequest(Long invoiceId, long amount, String orderInfo) {
 
 		String requestId = UUID.randomUUID().toString();
@@ -45,7 +42,6 @@ public class MomoUtil {
 		String extraData = "";
 		String requestType = "captureWallet";
 
-		// ✅ SIGNATURE CHUẨN (KHÔNG có partnerName, storeId)
 		String rawSignature = "accessKey=" + accessKey
 				+ "&amount=" + amount
 				+ "&extraData=" + extraData
@@ -63,26 +59,22 @@ public class MomoUtil {
 		log.info("[MoMo DEBUG] Generated Signature: {}", signature);
 
 		return MomoPaymentRequest.builder()
-				.partnerCode(partnerCode) //
-				.partnerName("BCB BADMINTON") //
-				.storeId("RBssxkdMJqFK44MM") //
-				// .accessKey(accessKey)
-				.requestId(requestId) //
-				.amount(amount) //
-				.orderId(orderId) //
-				.orderInfo(orderInfo) //
-				.redirectUrl(redirectUrl) //
-				.ipnUrl(ipnUrl) //
-				.extraData(extraData) //
-				.requestType(requestType) //
-				.signature(signature) //
-				.lang("vi") //
+				.partnerCode(partnerCode)
+				.partnerName("BCB BADMINTON")
+				.storeId("RBssxkdMJqFK44MM")
+				.requestId(requestId)
+				.amount(amount)
+				.orderId(orderId)
+				.orderInfo(orderInfo)
+				.redirectUrl(redirectUrl)
+				.ipnUrl(ipnUrl)
+				.extraData(extraData)
+				.requestType(requestType)
+				.signature(signature)
+				.lang("vi")
 				.build();
 	}
 
-	// =========================================================
-	// HMAC SHA256
-	// =========================================================
 	private String hmacSHA256(String key, String data) {
 		try {
 			Mac mac = Mac.getInstance("HmacSHA256");
@@ -94,17 +86,14 @@ public class MomoUtil {
 		}
 	}
 
-	// =========================================================
-	// REQUEST DTO
-	// =========================================================
 	@lombok.Data
 	@lombok.Builder
 	@lombok.NoArgsConstructor
 	@lombok.AllArgsConstructor
 	public static class MomoPaymentRequest {
 		private String partnerCode;
-		private String partnerName; // ✅ chỉ JSON
-		private String storeId; // ✅ chỉ JSON
+		private String partnerName;
+		private String storeId;
 		private String accessKey;
 		private String requestId;
 		private long amount;
@@ -118,9 +107,6 @@ public class MomoUtil {
 		private String lang;
 	}
 
-	// =========================================================
-	// IPN CALLBACK DTO
-	// =========================================================
 	@lombok.Data
 	@lombok.NoArgsConstructor
 	@lombok.AllArgsConstructor
