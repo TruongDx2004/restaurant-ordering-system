@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import restaurant.project.order_table.entity.enums.MessageSender;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +34,24 @@ public class WebSocketService {
 				.content(content)
 				.invoiceId(invoiceId)
 				.tableId(tableId)
+				.data(Map.of(
+						"invoiceId", invoiceId,
+						"tableId", tableId))
 				.timestamp(LocalDateTime.now())
 				.build();
 
 		messagingTemplate.convertAndSend("/topic/orders", message);
 	}
 
-	public void sendTableStatusUpdate(Long tableId, String status, Object data) {
+	public void sendTableStatusUpdate(Long tableId, String status) {
 		WebSocketMessage message = WebSocketMessage.builder()
 				.type("TABLE_STATUS_UPDATE")
 				.sender(MessageSender.SYSTEM)
 				.content("Table " + tableId + " status: " + status)
 				.tableId(tableId)
-				.data(data)
+				.data(Map.of(
+						"tableId", tableId,
+						"status", status))
 				.timestamp(LocalDateTime.now())
 				.build();
 
@@ -95,7 +101,10 @@ public class WebSocketService {
 				.content("Payment " + status + " for table " + tableId)
 				.invoiceId(invoiceId)
 				.tableId(tableId)
-				.data(status)
+				.data(Map.of(
+						"invoiceId", invoiceId,
+						"tableId", tableId,
+						"status", status))
 				.timestamp(LocalDateTime.now())
 				.build();
 
@@ -106,9 +115,12 @@ public class WebSocketService {
 		WebSocketMessage message = WebSocketMessage.builder()
 				.type("ITEM_STATUS_UPDATE")
 				.sender(MessageSender.SYSTEM)
-				.content("Item " + itemId + " in order " + invoiceId + " status: " + status)
+				.content("Item " + itemId + " updated")
 				.invoiceId(invoiceId)
-				.data(itemId)
+				.data(Map.of(
+						"invoiceId", invoiceId,
+						"itemId", itemId,
+						"status", status))
 				.timestamp(LocalDateTime.now())
 				.build();
 

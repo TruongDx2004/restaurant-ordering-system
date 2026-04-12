@@ -58,7 +58,7 @@ const TableManagement = () => {
       console.log('[Table Management] Received table status update:', message);
       setTables(prevTables =>
         prevTables.map(table =>
-          table.id === message.tableId ? { ...table, status: message.status } : table
+          table.id === message.tableId ? { ...table, status: message.data.status } : table
         )
       );
     });

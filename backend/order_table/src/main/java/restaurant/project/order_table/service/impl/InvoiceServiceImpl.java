@@ -226,7 +226,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 				"Đơn hàng mới từ bàn " + (table.getTableNumber() != null ? table.getTableNumber() : table.getId()));
 
 		if (table.getStatus() == TableStatus.OCCUPIED) {
-			webSocketService.sendTableStatusUpdate(table.getId(), "OCCUPIED", null);
+			webSocketService.sendTableStatusUpdate(table.getId(), "OCCUPIED");
 		}
 
 		return savedInvoice;
